@@ -1,22 +1,19 @@
-# Source files
+# Source TypeScript files (keep only compiled JS)
+nodes/
+credentials/
 *.ts
-!*.d.ts
+!dist/**/*.d.ts
 
 # Config files
 tsconfig.json
 .eslintrc.js
 .prettierrc
+.gitignore
 
 # Development files
 *.map
 *.spec.*
 *.test.*
-
-# Directories
-nodes/**/*.ts
-!nodes/**/*.d.ts
-credentials/**/*.ts
-!credentials/**/*.d.ts
 
 # Build artifacts
 *.tsbuildinfo
