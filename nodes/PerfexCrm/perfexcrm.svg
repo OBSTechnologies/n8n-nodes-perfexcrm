@@ -1,5 +1,26 @@
-<svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="60" height="60" rx="8" fill="#2563EB"/>
-  <path d="M30 12C20.059 12 12 20.059 12 30C12 39.941 20.059 48 30 48C39.941 48 48 39.941 48 30C48 20.059 39.941 12 30 12ZM30 16.5C37.456 16.5 43.5 22.544 43.5 30C43.5 37.456 37.456 43.5 30 43.5C22.544 43.5 16.5 37.456 16.5 30C16.5 22.544 22.544 16.5 30 16.5Z" fill="white"/>
-  <path d="M30 21C25.029 21 21 25.029 21 30C21 34.971 25.029 39 30 39C34.971 39 39 34.971 39 30C39 25.029 34.971 21 30 21ZM30 24.75C32.899 24.75 35.25 27.101 35.25 30C35.25 32.899 32.899 35.25 30 35.25C27.101 35.25 24.75 32.899 24.75 30C24.75 27.101 27.101 24.75 30 24.75Z" fill="white"/>
+<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e88e5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0d47a1;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background rectangle -->
+  <rect width="60" height="60" rx="12" fill="url(#gradient)"/>
+  
+  <!-- Letter P styled like PerfexCRM -->
+  <g fill="white">
+    <!-- Main P shape -->
+    <path d="M 18 15 L 24 15 L 24 45 L 18 45 Z M 24 15 L 36 15 C 40.418 15 44 18.582 44 23 C 44 27.418 40.418 31 36 31 L 24 31 L 24 25 L 36 25 C 37.105 25 38 24.105 38 23 C 38 21.895 37.105 21 36 21 L 24 21 Z" />
+    
+    <!-- Small accent bars for modern look -->
+    <rect x="40" y="36" width="8" height="2" rx="1" opacity="0.8"/>
+    <rect x="40" y="41" width="8" height="2" rx="1" opacity="0.6"/>
+    <rect x="40" y="46" width="8" height="2" rx="1" opacity="0.4"/>
+  </g>
+  
+  <!-- Small circle accent -->
+  <circle cx="48" cy="15" r="3" fill="#4ade80"/>
 </svg>
