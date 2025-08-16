@@ -1,10 +1,28 @@
 # n8n-nodes-perfexcrm
 
+[![npm version](https://badge.fury.io/js/n8n-nodes-perfexcrm.svg)](https://www.npmjs.com/package/n8n-nodes-perfexcrm)
+[![GitHub release](https://img.shields.io/github/release/OBSTechnologies/n8n-nodes-perfexcrm.svg)](https://github.com/OBSTechnologies/n8n-nodes-perfexcrm/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![n8n Community Nodes](https://img.shields.io/badge/n8n-Community%20Nodes-orange)](https://n8n.io/)
+
 This is an n8n community node. It lets you use PerfexCRM in your n8n workflows.
 
 PerfexCRM is a powerful customer relationship management system. This node allows you to interact with the PerfexCRM API and receive webhooks for real-time events.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
+
+## 🛒 Prerequisites - PerfexCRM API & Webhooks Module
+
+**This n8n node requires the PerfexCRM API & Webhooks module to be installed on your PerfexCRM instance.**
+
+### 👉 [Purchase the PerfexCRM API & Webhooks Module at perfexapi.com](https://perfexapi.com)
+
+The module provides:
+- RESTful API endpoints for all PerfexCRM entities
+- Webhook support for real-time events
+- API key authentication
+- Rate limiting and security features
+- Comprehensive documentation
 
 ## Installation
 
@@ -98,22 +116,67 @@ You'll need to enter the following credentials to use this node:
 4. Create a new API key with the appropriate permissions
 5. Copy the API key (you'll only see it once!)
 
+## Example Workflows
+
+### 🎯 Lead to Customer Automation
+Automatically convert leads to customers when they meet certain criteria, create a project, and send a welcome email.
+
+### 💰 Invoice Payment Tracking
+Track invoice payments in real-time, update your accounting system, and notify your team.
+
+### 🎫 Support Ticket Routing
+Automatically assign tickets based on department, priority, or customer type, and send notifications to the right team members.
+
+### 📊 Customer Onboarding
+Create a complete onboarding workflow: create customer, setup project, generate first invoice, and send welcome materials.
+
 ## Compatibility
 
-- Requires n8n version 0.180.0 or later
-- Tested with PerfexCRM 2.3.x and later
+- ✅ n8n version 0.180.0 or later
+- ✅ PerfexCRM 2.3.x or later
+- ✅ PerfexCRM API & Webhooks Module (required)
 
 ## Resources
 
-* [n8n community nodes documentation](https://docs.n8n.io/integrations/community-nodes/)
-* [PerfexCRM API Documentation](https://your-perfex.com/admin/api_webhooks/documentation)
+* 🛒 [Purchase PerfexCRM API & Webhooks Module](https://perfexapi.com)
+* 📚 [n8n Community Nodes Documentation](https://docs.n8n.io/integrations/community-nodes/)
+* 📖 [PerfexCRM API Documentation](https://your-perfex.com/admin/api_webhooks/documentation)
+* 🔧 [GitHub Repository](https://github.com/OBSTechnologies/n8n-nodes-perfexcrm)
+* 📦 [npm Package](https://www.npmjs.com/package/n8n-nodes-perfexcrm)
 
 ## Support
 
-For issues specific to this node, please create an issue in this repository.
+### For n8n Node Issues:
+- 🐛 [Open an issue on GitHub](https://github.com/OBSTechnologies/n8n-nodes-perfexcrm/issues)
+- 💬 [n8n Community Forum](https://community.n8n.io/)
 
-For general n8n support, visit the [n8n community forum](https://community.n8n.io/).
+### For PerfexCRM API & Webhooks Module:
+- 🛒 [Support at perfexapi.com](https://perfexapi.com)
+- 📧 Email: support@obstechnologies.com
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## Author
+
+**OBS Technologies**
+- Website: [obstechnologies.com](https://obstechnologies.com)
+- PerfexCRM Modules: [perfexapi.com](https://perfexapi.com)
+- GitHub: [@OBSTechnologies](https://github.com/OBSTechnologies)
 
 ## License
 
-[MIT](https://github.com/your-org/n8n-nodes-perfexcrm/blob/master/LICENSE.md)
+[MIT](https://github.com/OBSTechnologies/n8n-nodes-perfexcrm/blob/main/LICENSE) © OBS Technologies
+
+---
+
+**Made with ❤️ by [OBS Technologies](https://obstechnologies.com)**
+
+⭐ If you find this node useful, please star it on [GitHub](https://github.com/OBSTechnologies/n8n-nodes-perfexcrm)!
