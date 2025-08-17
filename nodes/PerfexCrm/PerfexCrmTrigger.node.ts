@@ -12,7 +12,7 @@ export class PerfexCrmTrigger implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'PerfexCRM Trigger',
 		name: 'perfexCrmTrigger',
-		icon: 'file:perfexcrm.svg',
+		icon: 'file:perfexcrm.png',
 		group: ['trigger'],
 		version: 1,
 		subtitle: '={{$parameter["event"]}}',

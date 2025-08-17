@@ -1,13 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" width="60" height="60">
-  <!-- Background -->
-  <rect x="0" y="0" width="60" height="60" rx="8" fill="#ffffff"/>
-  
-  <!-- Dark gray vertical bar (stem of P) -->
-  <rect x="14" y="10" width="16" height="40" fill="#374151"/>
-  
-  <!-- Pink triangle (top-left) -->
-  <polygon points="14,10 30,10 30,16 14,10" fill="#ec4899"/>
-  
-  <!-- Cyan quarter circle (top-right of P) -->
-  <path d="M 30 10 L 40 10 A 15 15 0 0 1 40 28 L 30 28 L 30 16 Z" fill="#22d3ee"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="60px" height="60px" viewBox="0 0 60 60" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <g id="perfexcrm" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect fill="#FFFFFF" x="0" y="0" width="60" height="60" rx="8"></rect>
+        <rect id="stem" fill="#374151" x="14" y="10" width="16" height="40"></rect>
+        <polygon id="triangle" fill="#EC4899" points="14 10 30 10 30 16"></polygon>
+        <path d="M30,10 L40,10 C40,10 46,10 46,20 C46,30 40,30 40,30 L30,30 L30,16 L30,10 Z" id="curve" fill="#22D3EE"></path>
+    </g>
 </svg>
