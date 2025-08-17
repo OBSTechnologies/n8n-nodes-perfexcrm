@@ -1,26 +1,19 @@
 <svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background gradient -->
-  <defs>
-    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#1e88e5;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#0d47a1;stop-opacity:1" />
-    </linearGradient>
-  </defs>
+  <!-- Light background for better visibility -->
+  <rect width="60" height="60" rx="10" fill="#F8FAFC"/>
   
-  <!-- Background rectangle -->
-  <rect width="60" height="60" rx="12" fill="url(#gradient)"/>
-  
-  <!-- Letter P styled like PerfexCRM -->
-  <g fill="white">
-    <!-- Main P shape -->
-    <path d="M 18 15 L 24 15 L 24 45 L 18 45 Z M 24 15 L 36 15 C 40.418 15 44 18.582 44 23 C 44 27.418 40.418 31 36 31 L 24 31 L 24 25 L 36 25 C 37.105 25 38 24.105 38 23 C 38 21.895 37.105 21 36 21 L 24 21 Z" />
+  <!-- PerfexCRM Logo centered and scaled appropriately -->
+  <g transform="translate(12, 10)">
+    <!-- Cyan/turquoise curved part (top-right of P) -->
+    <path d="M 18 0 L 24 0 C 33.941 0 42 8.059 42 18 C 42 27.941 33.941 36 24 36 L 24 18 L 18 12 L 18 0 Z" 
+          fill="#22D3EE"/>
     
-    <!-- Small accent bars for modern look -->
-    <rect x="40" y="36" width="8" height="2" rx="1" opacity="0.8"/>
-    <rect x="40" y="41" width="8" height="2" rx="1" opacity="0.6"/>
-    <rect x="40" y="46" width="8" height="2" rx="1" opacity="0.4"/>
+    <!-- Pink/magenta triangle (top-left of P) -->
+    <path d="M 0 0 L 18 0 L 18 12 L 0 0 Z" 
+          fill="#EC4899"/>
+    
+    <!-- Dark gray/black rectangle (bottom stem of P) -->
+    <path d="M 0 0 L 18 12 L 18 40 L 0 40 L 0 0 Z" 
+          fill="#374151"/>
   </g>
-  
-  <!-- Small circle accent -->
-  <circle cx="48" cy="15" r="3" fill="#4ade80"/>
 </svg>
