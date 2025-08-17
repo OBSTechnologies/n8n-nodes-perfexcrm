@@ -1,19 +1,13 @@
-<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
-  <!-- Light background for better visibility -->
-  <rect width="60" height="60" rx="10" fill="#F8FAFC"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" width="60" height="60">
+  <!-- Background -->
+  <rect x="0" y="0" width="60" height="60" rx="8" fill="#ffffff"/>
   
-  <!-- PerfexCRM Logo centered and scaled appropriately -->
-  <g transform="translate(12, 10)">
-    <!-- Cyan/turquoise curved part (top-right of P) -->
-    <path d="M 18 0 L 24 0 C 33.941 0 42 8.059 42 18 C 42 27.941 33.941 36 24 36 L 24 18 L 18 12 L 18 0 Z" 
-          fill="#22D3EE"/>
-    
-    <!-- Pink/magenta triangle (top-left of P) -->
-    <path d="M 0 0 L 18 0 L 18 12 L 0 0 Z" 
-          fill="#EC4899"/>
-    
-    <!-- Dark gray/black rectangle (bottom stem of P) -->
-    <path d="M 0 0 L 18 12 L 18 40 L 0 40 L 0 0 Z" 
-          fill="#374151"/>
-  </g>
+  <!-- Dark gray vertical bar (stem of P) -->
+  <rect x="14" y="10" width="16" height="40" fill="#374151"/>
+  
+  <!-- Pink triangle (top-left) -->
+  <polygon points="14,10 30,10 30,16 14,10" fill="#ec4899"/>
+  
+  <!-- Cyan quarter circle (top-right of P) -->
+  <path d="M 30 10 L 40 10 A 15 15 0 0 1 40 28 L 30 28 L 30 16 Z" fill="#22d3ee"/>
 </svg>
