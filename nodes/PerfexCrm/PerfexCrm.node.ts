@@ -40,7 +40,7 @@ export class PerfexCrm implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'PerfexCRM',
 		name: 'perfexCrm',
-		icon: 'file:perfexcrm.png',
+		icon: 'file:perfexcrm.svg',
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
