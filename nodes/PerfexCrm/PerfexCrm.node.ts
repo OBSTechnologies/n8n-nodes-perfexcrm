@@ -3,7 +3,6 @@ import {
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
-	NodeConnectionType,
 } from 'n8n-workflow';
 
 import {
@@ -48,8 +47,8 @@ export class PerfexCrm implements INodeType {
 		defaults: {
 			name: 'PerfexCRM',
 		},
-		inputs: [NodeConnectionType.Main],
-		outputs: [NodeConnectionType.Main],
+		inputs: ['main'],
+		outputs: ['main'],
 		credentials: [
 			{
 				name: 'perfexCrmApi',
@@ -180,12 +179,72 @@ export class PerfexCrm implements INodeType {
 						});
 					} else if (operation === 'delete') {
 						const customerId = this.getNodeParameter('customerId', i) as string;
-						
+
 						responseData = await this.helpers.request({
 							method: 'DELETE',
 							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}`,
 							json: true,
 						});
+					} else if (operation === 'getContacts') {
+						const customerId = this.getNodeParameter('customerId', i) as string;
+
+						responseData = await this.helpers.request({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}/contacts`,
+							json: true,
+						});
+
+						if (responseData.data) {
+							responseData = responseData.data;
+						}
+					} else if (operation === 'getContracts') {
+						const customerId = this.getNodeParameter('customerId', i) as string;
+
+						responseData = await this.helpers.request({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}/contracts`,
+							json: true,
+						});
+
+						if (responseData.data) {
+							responseData = responseData.data;
+						}
+					} else if (operation === 'getInvoices') {
+						const customerId = this.getNodeParameter('customerId', i) as string;
+
+						responseData = await this.helpers.request({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}/invoices`,
+							json: true,
+						});
+
+						if (responseData.data) {
+							responseData = responseData.data;
+						}
+					} else if (operation === 'getProjects') {
+						const customerId = this.getNodeParameter('customerId', i) as string;
+
+						responseData = await this.helpers.request({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}/projects`,
+							json: true,
+						});
+
+						if (responseData.data) {
+							responseData = responseData.data;
+						}
+					} else if (operation === 'getTickets') {
+						const customerId = this.getNodeParameter('customerId', i) as string;
+
+						responseData = await this.helpers.request({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}/tickets`,
+							json: true,
+						});
+
+						if (responseData.data) {
+							responseData = responseData.data;
+						}
 					}
 				} else if (resource === 'ticket') {
 					if (operation === 'create') {
@@ -277,18 +336,59 @@ export class PerfexCrm implements INodeType {
 						const ticketId = this.getNodeParameter('ticketId', i) as string;
 						const message = this.getNodeParameter('message', i) as string;
 						const additionalFields = this.getNodeParameter('additionalFields', i);
-						
+
 						const body: any = {
 							message,
 							...additionalFields,
 						};
-						
+
 						responseData = await this.helpers.request({
 							method: 'POST',
 							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}/replies`,
 							body,
 							json: true,
 						});
+					} else if (operation === 'getReply') {
+						const ticketId = this.getNodeParameter('ticketId', i) as string;
+						const replyId = this.getNodeParameter('replyId', i) as string;
+
+						responseData = await this.helpers.request({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}/replies/${replyId}`,
+							json: true,
+						});
+					} else if (operation === 'updateReply') {
+						const ticketId = this.getNodeParameter('ticketId', i) as string;
+						const replyId = this.getNodeParameter('replyId', i) as string;
+						const updateFields = this.getNodeParameter('updateFields', i);
+
+						responseData = await this.helpers.request({
+							method: 'PUT',
+							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}/replies/${replyId}`,
+							body: updateFields,
+							json: true,
+						});
+					} else if (operation === 'deleteReply') {
+						const ticketId = this.getNodeParameter('ticketId', i) as string;
+						const replyId = this.getNodeParameter('replyId', i) as string;
+
+						responseData = await this.helpers.request({
+							method: 'DELETE',
+							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}/replies/${replyId}`,
+							json: true,
+						});
+					} else if (operation === 'listReplies') {
+						const ticketId = this.getNodeParameter('ticketId', i) as string;
+
+						responseData = await this.helpers.request({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}/replies`,
+							json: true,
+						});
+
+						if (responseData.data) {
+							responseData = responseData.data;
+						}
 					}
 				} else if (resource === 'invoice') {
 					if (operation === 'create') {
@@ -344,6 +444,26 @@ export class PerfexCrm implements INodeType {
 						if (responseData.data) {
 							responseData = responseData.data;
 						}
+					} else if (operation === 'update') {
+						const invoiceId = this.getNodeParameter('invoiceId', i) as string;
+						const updateFields = this.getNodeParameter('updateFields', i);
+
+						const body = updateFields;
+
+						responseData = await this.helpers.request({
+							method: 'PUT',
+							url: `${baseUrl}/api/${apiVersion}/invoices/${invoiceId}`,
+							body,
+							json: true,
+						});
+					} else if (operation === 'delete') {
+						const invoiceId = this.getNodeParameter('invoiceId', i) as string;
+
+						responseData = await this.helpers.request({
+							method: 'DELETE',
+							url: `${baseUrl}/api/${apiVersion}/invoices/${invoiceId}`,
+							json: true,
+						});
 					}
 				} else if (resource === 'lead') {
 					if (operation === 'create') {
@@ -363,9 +483,53 @@ export class PerfexCrm implements INodeType {
 						});
 					} else if (operation === 'get') {
 						const leadId = this.getNodeParameter('leadId', i) as string;
-						
+
 						responseData = await this.helpers.request({
 							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/leads/${leadId}`,
+							json: true,
+						});
+					} else if (operation === 'getAll') {
+						const returnAll = this.getNodeParameter('returnAll', i);
+						const filters = this.getNodeParameter('filters', i);
+
+						const qs: any = {};
+
+						if (!returnAll) {
+							qs.limit = this.getNodeParameter('limit', i);
+						} else {
+							qs.limit = 1000;
+						}
+
+						Object.assign(qs, filters);
+
+						responseData = await this.helpers.request({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/leads`,
+							qs,
+							json: true,
+						});
+
+						if (responseData.data) {
+							responseData = responseData.data;
+						}
+					} else if (operation === 'update') {
+						const leadId = this.getNodeParameter('leadId', i) as string;
+						const updateFields = this.getNodeParameter('updateFields', i);
+
+						const body = updateFields;
+
+						responseData = await this.helpers.request({
+							method: 'PUT',
+							url: `${baseUrl}/api/${apiVersion}/leads/${leadId}`,
+							body,
+							json: true,
+						});
+					} else if (operation === 'delete') {
+						const leadId = this.getNodeParameter('leadId', i) as string;
+
+						responseData = await this.helpers.request({
+							method: 'DELETE',
 							url: `${baseUrl}/api/${apiVersion}/leads/${leadId}`,
 							json: true,
 						});
@@ -383,7 +547,7 @@ export class PerfexCrm implements INodeType {
 						const name = this.getNodeParameter('name', i) as string;
 						const clientId = this.getNodeParameter('clientId', i) as string;
 						const additionalFields = this.getNodeParameter('additionalFields', i);
-						
+
 						const body: any = {
 							name,
 							clientid: clientId,
@@ -398,9 +562,53 @@ export class PerfexCrm implements INodeType {
 						});
 					} else if (operation === 'get') {
 						const projectId = this.getNodeParameter('projectId', i) as string;
-						
+
 						responseData = await this.helpers.request({
 							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/projects/${projectId}`,
+							json: true,
+						});
+					} else if (operation === 'getAll') {
+						const returnAll = this.getNodeParameter('returnAll', i);
+						const filters = this.getNodeParameter('filters', i);
+
+						const qs: any = {};
+
+						if (!returnAll) {
+							qs.limit = this.getNodeParameter('limit', i);
+						} else {
+							qs.limit = 1000;
+						}
+
+						Object.assign(qs, filters);
+
+						responseData = await this.helpers.request({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/projects`,
+							qs,
+							json: true,
+						});
+
+						if (responseData.data) {
+							responseData = responseData.data;
+						}
+					} else if (operation === 'update') {
+						const projectId = this.getNodeParameter('projectId', i) as string;
+						const updateFields = this.getNodeParameter('updateFields', i);
+
+						const body = updateFields;
+
+						responseData = await this.helpers.request({
+							method: 'PUT',
+							url: `${baseUrl}/api/${apiVersion}/projects/${projectId}`,
+							body,
+							json: true,
+						});
+					} else if (operation === 'delete') {
+						const projectId = this.getNodeParameter('projectId', i) as string;
+
+						responseData = await this.helpers.request({
+							method: 'DELETE',
 							url: `${baseUrl}/api/${apiVersion}/projects/${projectId}`,
 							json: true,
 						});
@@ -412,7 +620,7 @@ export class PerfexCrm implements INodeType {
 						const datestart = this.getNodeParameter('datestart', i) as string;
 						const dateend = this.getNodeParameter('dateend', i) as string;
 						const additionalFields = this.getNodeParameter('additionalFields', i);
-						
+
 						const body: any = {
 							subject,
 							client,
@@ -429,10 +637,70 @@ export class PerfexCrm implements INodeType {
 						});
 					} else if (operation === 'get') {
 						const contractId = this.getNodeParameter('contractId', i) as string;
-						
+
 						responseData = await this.helpers.request({
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/contracts/${contractId}`,
+							json: true,
+						});
+					} else if (operation === 'getAll') {
+						const returnAll = this.getNodeParameter('returnAll', i);
+						const filters = this.getNodeParameter('filters', i);
+
+						const qs: any = {};
+
+						if (!returnAll) {
+							qs.limit = this.getNodeParameter('limit', i);
+						} else {
+							qs.limit = 1000;
+						}
+
+						Object.assign(qs, filters);
+
+						responseData = await this.helpers.request({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/contracts`,
+							qs,
+							json: true,
+						});
+
+						if (responseData.data) {
+							responseData = responseData.data;
+						}
+					} else if (operation === 'update') {
+						const contractId = this.getNodeParameter('contractId', i) as string;
+						const updateFields = this.getNodeParameter('updateFields', i);
+
+						const body = updateFields;
+
+						responseData = await this.helpers.request({
+							method: 'PUT',
+							url: `${baseUrl}/api/${apiVersion}/contracts/${contractId}`,
+							body,
+							json: true,
+						});
+					} else if (operation === 'delete') {
+						const contractId = this.getNodeParameter('contractId', i) as string;
+
+						responseData = await this.helpers.request({
+							method: 'DELETE',
+							url: `${baseUrl}/api/${apiVersion}/contracts/${contractId}`,
+							json: true,
+						});
+					} else if (operation === 'sign') {
+						const contractId = this.getNodeParameter('contractId', i) as string;
+						const signature = this.getNodeParameter('signature', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i);
+
+						const body: any = {
+							signature,
+							...additionalFields,
+						};
+
+						responseData = await this.helpers.request({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/contracts/${contractId}/sign`,
+							body,
 							json: true,
 						});
 					}

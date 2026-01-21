@@ -42,6 +42,36 @@ export const customerOperations: INodeProperties[] = [
 				description: 'Update a customer',
 				action: 'Update a customer',
 			},
+			{
+				name: 'Get Contacts',
+				value: 'getContacts',
+				description: 'Get contacts for a customer',
+				action: 'Get contacts for a customer',
+			},
+			{
+				name: 'Get Contracts',
+				value: 'getContracts',
+				description: 'Get contracts for a customer',
+				action: 'Get contracts for a customer',
+			},
+			{
+				name: 'Get Invoices',
+				value: 'getInvoices',
+				description: 'Get invoices for a customer',
+				action: 'Get invoices for a customer',
+			},
+			{
+				name: 'Get Projects',
+				value: 'getProjects',
+				description: 'Get projects for a customer',
+				action: 'Get projects for a customer',
+			},
+			{
+				name: 'Get Tickets',
+				value: 'getTickets',
+				description: 'Get tickets for a customer',
+				action: 'Get tickets for a customer',
+			},
 		],
 		default: 'create',
 	},
@@ -418,6 +448,96 @@ export const customerFields: INodeProperties[] = [
 			show: {
 				resource: ['customer'],
 				operation: ['delete'],
+			},
+		},
+		description: 'The ID of the customer',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                                customer:getContacts                       */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Customer ID',
+		name: 'customerId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['customer'],
+				operation: ['getContacts'],
+			},
+		},
+		description: 'The ID of the customer',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                                customer:getContracts                      */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Customer ID',
+		name: 'customerId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['customer'],
+				operation: ['getContracts'],
+			},
+		},
+		description: 'The ID of the customer',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                                customer:getInvoices                       */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Customer ID',
+		name: 'customerId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['customer'],
+				operation: ['getInvoices'],
+			},
+		},
+		description: 'The ID of the customer',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                                customer:getProjects                       */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Customer ID',
+		name: 'customerId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['customer'],
+				operation: ['getProjects'],
+			},
+		},
+		description: 'The ID of the customer',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                                customer:getTickets                        */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Customer ID',
+		name: 'customerId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['customer'],
+				operation: ['getTickets'],
 			},
 		},
 		description: 'The ID of the customer',

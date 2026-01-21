@@ -5,7 +5,6 @@ import {
 	INodeType,
 	INodeTypeDescription,
 	IWebhookResponseData,
-	NodeConnectionType,
 } from 'n8n-workflow';
 
 export class PerfexCrmTrigger implements INodeType {
@@ -21,7 +20,7 @@ export class PerfexCrmTrigger implements INodeType {
 			name: 'PerfexCRM Trigger',
 		},
 		inputs: [],
-		outputs: [NodeConnectionType.Main],
+		outputs: ['main'],
 		credentials: [
 			{
 				name: 'perfexCrmApi',

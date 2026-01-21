@@ -31,6 +31,12 @@ export const ticketOperations: INodeProperties[] = [
 				action: 'Delete a ticket',
 			},
 			{
+				name: 'Delete Reply',
+				value: 'deleteReply',
+				description: 'Delete a reply from a ticket',
+				action: 'Delete reply from ticket',
+			},
+			{
 				name: 'Get',
 				value: 'get',
 				description: 'Get a ticket',
@@ -43,10 +49,28 @@ export const ticketOperations: INodeProperties[] = [
 				action: 'Get many tickets',
 			},
 			{
+				name: 'Get Reply',
+				value: 'getReply',
+				description: 'Get a reply from a ticket',
+				action: 'Get reply from ticket',
+			},
+			{
+				name: 'List Replies',
+				value: 'listReplies',
+				description: 'Get all replies from a ticket',
+				action: 'Get all replies from ticket',
+			},
+			{
 				name: 'Update',
 				value: 'update',
 				description: 'Update a ticket',
 				action: 'Update a ticket',
+			},
+			{
+				name: 'Update Reply',
+				value: 'updateReply',
+				description: 'Update a reply on a ticket',
+				action: 'Update reply on ticket',
 			},
 		],
 		default: 'create',
@@ -570,5 +594,144 @@ export const ticketFields: INodeProperties[] = [
 				description: 'Email of the person replying',
 			},
 		],
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                               ticket:getReply                              */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Ticket ID',
+		name: 'ticketId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
+				operation: ['getReply'],
+			},
+		},
+		description: 'The ID of the ticket',
+	},
+	{
+		displayName: 'Reply ID',
+		name: 'replyId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
+				operation: ['getReply'],
+			},
+		},
+		description: 'The ID of the reply',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                              ticket:updateReply                            */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Ticket ID',
+		name: 'ticketId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
+				operation: ['updateReply'],
+			},
+		},
+		description: 'The ID of the ticket',
+	},
+	{
+		displayName: 'Reply ID',
+		name: 'replyId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
+				operation: ['updateReply'],
+			},
+		},
+		description: 'The ID of the reply',
+	},
+	{
+		displayName: 'Update Fields',
+		name: 'updateFields',
+		type: 'collection',
+		placeholder: 'Add Field',
+		default: {},
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
+				operation: ['updateReply'],
+			},
+		},
+		options: [
+			{
+				displayName: 'Message',
+				name: 'message',
+				type: 'string',
+				typeOptions: {
+					alwaysOpenEditWindow: true,
+				},
+				default: '',
+				description: 'Reply message content',
+			},
+		],
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                              ticket:deleteReply                            */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Ticket ID',
+		name: 'ticketId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
+				operation: ['deleteReply'],
+			},
+		},
+		description: 'The ID of the ticket',
+	},
+	{
+		displayName: 'Reply ID',
+		name: 'replyId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
+				operation: ['deleteReply'],
+			},
+		},
+		description: 'The ID of the reply',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                              ticket:listReplies                            */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Ticket ID',
+		name: 'ticketId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
+				operation: ['listReplies'],
+			},
+		},
+		description: 'The ID of the ticket',
 	},
 ];
