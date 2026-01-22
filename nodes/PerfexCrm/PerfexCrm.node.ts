@@ -121,6 +121,74 @@ export class PerfexCrm implements INodeType {
 			'X-API-KEY': apiKey,
 		};
 
+		// Helper function for paginated requests
+		const fetchAllPaginated = async (
+			url: string,
+			qs: Record<string, any>,
+			returnAll: boolean,
+			limit: number,
+		): Promise<any[]> => {
+			const allData: any[] = [];
+			let page = 1;
+			const pageSize = 100; // Items per page
+
+			if (returnAll) {
+				// Fetch all pages
+				while (true) {
+					const response = await this.helpers.request({
+						method: 'GET',
+						url,
+						qs: { ...qs, page, limit: pageSize },
+						json: true,
+						headers,
+					});
+
+					const data = response.data || response;
+					if (!Array.isArray(data) || data.length === 0) {
+						break;
+					}
+
+					allData.push(...data);
+
+					// If we got less than pageSize, we've reached the end
+					if (data.length < pageSize) {
+						break;
+					}
+
+					page++;
+				}
+			} else {
+				// Fetch only up to the specified limit
+				while (allData.length < limit) {
+					const response = await this.helpers.request({
+						method: 'GET',
+						url,
+						qs: { ...qs, page, limit: Math.min(pageSize, limit - allData.length) },
+						json: true,
+						headers,
+					});
+
+					const data = response.data || response;
+					if (!Array.isArray(data) || data.length === 0) {
+						break;
+					}
+
+					allData.push(...data);
+
+					if (data.length < pageSize || allData.length >= limit) {
+						break;
+					}
+
+					page++;
+				}
+
+				// Trim to exact limit
+				return allData.slice(0, limit);
+			}
+
+			return allData;
+		};
+
 		for (let i = 0; i < items.length; i++) {
 			try {
 				if (resource === 'customer') {
@@ -150,30 +218,16 @@ export class PerfexCrm implements INodeType {
 							headers,
 						});
 					} else if (operation === 'getAll') {
-						const returnAll = this.getNodeParameter('returnAll', i);
-						const filters = this.getNodeParameter('filters', i);
-						
-						const qs: any = {};
-						
-						if (!returnAll) {
-							qs.limit = this.getNodeParameter('limit', i);
-						} else {
-							qs.limit = 1000;
-						}
-						
-						Object.assign(qs, filters);
-						
-						responseData = await this.helpers.request({
-							method: 'GET',
-							url: `${baseUrl}/api/${apiVersion}/customers`,
-							qs,
-							json: true,
-							headers,
-						});
-						
-						if (responseData.data) {
-							responseData = responseData.data;
-						}
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+
+						responseData = await fetchAllPaginated(
+							`${baseUrl}/api/${apiVersion}/customers`,
+							filters,
+							returnAll,
+							limit,
+						);
 					} else if (operation === 'update') {
 						const customerId = this.getNodeParameter('customerId', i) as string;
 						const updateFields = this.getNodeParameter('updateFields', i);
@@ -298,43 +352,26 @@ export class PerfexCrm implements INodeType {
 							headers,
 						});
 					} else if (operation === 'getAll') {
-						const returnAll = this.getNodeParameter('returnAll', i);
-						const filters = this.getNodeParameter('filters', i);
-						
-						const qs: any = {};
-						
-						if (!returnAll) {
-							qs.limit = this.getNodeParameter('limit', i);
-						} else {
-							qs.limit = 1000;
-						}
-						
-						// Handle status filter
-						if (filters.status) {
-							qs.status = filters.status;
-						}
-						if (filters.department) {
-							qs.department = filters.department;
-						}
-						if (filters.priority) {
-							qs.priority = filters.priority;
-						}
-						
-						responseData = await this.helpers.request({
-							method: 'GET',
-							url: `${baseUrl}/api/${apiVersion}/tickets`,
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+
+						// Build query string with filters
+						const qs: Record<string, any> = {};
+						if (filters.status) qs.status = filters.status;
+						if (filters.department) qs.department = filters.department;
+						if (filters.priority) qs.priority = filters.priority;
+
+						responseData = await fetchAllPaginated(
+							`${baseUrl}/api/${apiVersion}/tickets`,
 							qs,
-							json: true,
-							headers,
-						});
-						
-						if (responseData.data) {
-							responseData = responseData.data;
-						}
+							returnAll,
+							limit,
+						);
 					} else if (operation === 'update') {
 						const ticketId = this.getNodeParameter('ticketId', i) as string;
 						const updateFields = this.getNodeParameter('updateFields', i);
-						
+
 						const body = updateFields;
 						
 						responseData = await this.helpers.request({
@@ -423,7 +460,7 @@ export class PerfexCrm implements INodeType {
 						const date = this.getNodeParameter('date', i) as string;
 						const duedate = this.getNodeParameter('duedate', i) as string;
 						const additionalFields = this.getNodeParameter('additionalFields', i);
-						
+
 						const body: any = {
 							clientid: clientId,
 							number,
@@ -441,7 +478,7 @@ export class PerfexCrm implements INodeType {
 						});
 					} else if (operation === 'get') {
 						const invoiceId = this.getNodeParameter('invoiceId', i) as string;
-						
+
 						responseData = await this.helpers.request({
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/invoices/${invoiceId}`,
@@ -449,30 +486,16 @@ export class PerfexCrm implements INodeType {
 							headers,
 						});
 					} else if (operation === 'getAll') {
-						const returnAll = this.getNodeParameter('returnAll', i);
-						const filters = this.getNodeParameter('filters', i);
-						
-						const qs: any = {};
-						
-						if (!returnAll) {
-							qs.limit = this.getNodeParameter('limit', i);
-						} else {
-							qs.limit = 1000;
-						}
-						
-						Object.assign(qs, filters);
-						
-						responseData = await this.helpers.request({
-							method: 'GET',
-							url: `${baseUrl}/api/${apiVersion}/invoices`,
-							qs,
-							json: true,
-							headers,
-						});
-						
-						if (responseData.data) {
-							responseData = responseData.data;
-						}
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+
+						responseData = await fetchAllPaginated(
+							`${baseUrl}/api/${apiVersion}/invoices`,
+							filters,
+							returnAll,
+							limit,
+						);
 					} else if (operation === 'update') {
 						const invoiceId = this.getNodeParameter('invoiceId', i) as string;
 						const updateFields = this.getNodeParameter('updateFields', i);
@@ -523,30 +546,16 @@ export class PerfexCrm implements INodeType {
 							headers,
 						});
 					} else if (operation === 'getAll') {
-						const returnAll = this.getNodeParameter('returnAll', i);
-						const filters = this.getNodeParameter('filters', i);
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
 
-						const qs: any = {};
-
-						if (!returnAll) {
-							qs.limit = this.getNodeParameter('limit', i);
-						} else {
-							qs.limit = 1000;
-						}
-
-						Object.assign(qs, filters);
-
-						responseData = await this.helpers.request({
-							method: 'GET',
-							url: `${baseUrl}/api/${apiVersion}/leads`,
-							qs,
-							json: true,
-							headers,
-						});
-
-						if (responseData.data) {
-							responseData = responseData.data;
-						}
+						responseData = await fetchAllPaginated(
+							`${baseUrl}/api/${apiVersion}/leads`,
+							filters,
+							returnAll,
+							limit,
+						);
 					} else if (operation === 'update') {
 						const leadId = this.getNodeParameter('leadId', i) as string;
 						const updateFields = this.getNodeParameter('updateFields', i);
@@ -608,30 +617,16 @@ export class PerfexCrm implements INodeType {
 							headers,
 						});
 					} else if (operation === 'getAll') {
-						const returnAll = this.getNodeParameter('returnAll', i);
-						const filters = this.getNodeParameter('filters', i);
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
 
-						const qs: any = {};
-
-						if (!returnAll) {
-							qs.limit = this.getNodeParameter('limit', i);
-						} else {
-							qs.limit = 1000;
-						}
-
-						Object.assign(qs, filters);
-
-						responseData = await this.helpers.request({
-							method: 'GET',
-							url: `${baseUrl}/api/${apiVersion}/projects`,
-							qs,
-							json: true,
-							headers,
-						});
-
-						if (responseData.data) {
-							responseData = responseData.data;
-						}
+						responseData = await fetchAllPaginated(
+							`${baseUrl}/api/${apiVersion}/projects`,
+							filters,
+							returnAll,
+							limit,
+						);
 					} else if (operation === 'update') {
 						const projectId = this.getNodeParameter('projectId', i) as string;
 						const updateFields = this.getNodeParameter('updateFields', i);
@@ -688,30 +683,16 @@ export class PerfexCrm implements INodeType {
 							headers,
 						});
 					} else if (operation === 'getAll') {
-						const returnAll = this.getNodeParameter('returnAll', i);
-						const filters = this.getNodeParameter('filters', i);
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
 
-						const qs: any = {};
-
-						if (!returnAll) {
-							qs.limit = this.getNodeParameter('limit', i);
-						} else {
-							qs.limit = 1000;
-						}
-
-						Object.assign(qs, filters);
-
-						responseData = await this.helpers.request({
-							method: 'GET',
-							url: `${baseUrl}/api/${apiVersion}/contracts`,
-							qs,
-							json: true,
-							headers,
-						});
-
-						if (responseData.data) {
-							responseData = responseData.data;
-						}
+						responseData = await fetchAllPaginated(
+							`${baseUrl}/api/${apiVersion}/contracts`,
+							filters,
+							returnAll,
+							limit,
+						);
 					} else if (operation === 'update') {
 						const contractId = this.getNodeParameter('contractId', i) as string;
 						const updateFields = this.getNodeParameter('updateFields', i);
