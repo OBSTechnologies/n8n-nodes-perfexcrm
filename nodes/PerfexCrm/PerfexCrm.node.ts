@@ -114,6 +114,12 @@ export class PerfexCrm implements INodeType {
 		let responseData;
 		const baseUrl = credentials.baseUrl as string;
 		const apiVersion = credentials.apiVersion as string;
+		const apiKey = credentials.apiKey as string;
+
+		// Headers with API key for authentication
+		const headers = {
+			'X-API-KEY': apiKey,
+		};
 
 		for (let i = 0; i < items.length; i++) {
 			try {
@@ -132,6 +138,7 @@ export class PerfexCrm implements INodeType {
 							url: `${baseUrl}/api/${apiVersion}/customers`,
 							body,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'get') {
 						const customerId = this.getNodeParameter('customerId', i) as string;
@@ -140,6 +147,7 @@ export class PerfexCrm implements INodeType {
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}`,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'getAll') {
 						const returnAll = this.getNodeParameter('returnAll', i);
@@ -160,6 +168,7 @@ export class PerfexCrm implements INodeType {
 							url: `${baseUrl}/api/${apiVersion}/customers`,
 							qs,
 							json: true,
+							headers,
 						});
 						
 						if (responseData.data) {
@@ -176,6 +185,7 @@ export class PerfexCrm implements INodeType {
 							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}`,
 							body,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'delete') {
 						const customerId = this.getNodeParameter('customerId', i) as string;
@@ -184,6 +194,7 @@ export class PerfexCrm implements INodeType {
 							method: 'DELETE',
 							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}`,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'getContacts') {
 						const customerId = this.getNodeParameter('customerId', i) as string;
@@ -192,6 +203,7 @@ export class PerfexCrm implements INodeType {
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}/contacts`,
 							json: true,
+							headers,
 						});
 
 						if (responseData.data) {
@@ -204,6 +216,7 @@ export class PerfexCrm implements INodeType {
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}/contracts`,
 							json: true,
+							headers,
 						});
 
 						if (responseData.data) {
@@ -216,6 +229,7 @@ export class PerfexCrm implements INodeType {
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}/invoices`,
 							json: true,
+							headers,
 						});
 
 						if (responseData.data) {
@@ -228,6 +242,7 @@ export class PerfexCrm implements INodeType {
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}/projects`,
 							json: true,
+							headers,
 						});
 
 						if (responseData.data) {
@@ -240,6 +255,7 @@ export class PerfexCrm implements INodeType {
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}/tickets`,
 							json: true,
+							headers,
 						});
 
 						if (responseData.data) {
@@ -263,6 +279,7 @@ export class PerfexCrm implements INodeType {
 							url: `${baseUrl}/api/${apiVersion}/tickets`,
 							body,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'get') {
 						const ticketId = this.getNodeParameter('ticketId', i) as string;
@@ -278,6 +295,7 @@ export class PerfexCrm implements INodeType {
 							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}`,
 							qs,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'getAll') {
 						const returnAll = this.getNodeParameter('returnAll', i);
@@ -307,6 +325,7 @@ export class PerfexCrm implements INodeType {
 							url: `${baseUrl}/api/${apiVersion}/tickets`,
 							qs,
 							json: true,
+							headers,
 						});
 						
 						if (responseData.data) {
@@ -323,6 +342,7 @@ export class PerfexCrm implements INodeType {
 							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}`,
 							body,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'delete') {
 						const ticketId = this.getNodeParameter('ticketId', i) as string;
@@ -331,6 +351,7 @@ export class PerfexCrm implements INodeType {
 							method: 'DELETE',
 							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}`,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'addReply') {
 						const ticketId = this.getNodeParameter('ticketId', i) as string;
@@ -347,6 +368,7 @@ export class PerfexCrm implements INodeType {
 							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}/replies`,
 							body,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'getReply') {
 						const ticketId = this.getNodeParameter('ticketId', i) as string;
@@ -356,6 +378,7 @@ export class PerfexCrm implements INodeType {
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}/replies/${replyId}`,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'updateReply') {
 						const ticketId = this.getNodeParameter('ticketId', i) as string;
@@ -367,6 +390,7 @@ export class PerfexCrm implements INodeType {
 							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}/replies/${replyId}`,
 							body: updateFields,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'deleteReply') {
 						const ticketId = this.getNodeParameter('ticketId', i) as string;
@@ -376,6 +400,7 @@ export class PerfexCrm implements INodeType {
 							method: 'DELETE',
 							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}/replies/${replyId}`,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'listReplies') {
 						const ticketId = this.getNodeParameter('ticketId', i) as string;
@@ -384,6 +409,7 @@ export class PerfexCrm implements INodeType {
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}/replies`,
 							json: true,
+							headers,
 						});
 
 						if (responseData.data) {
@@ -411,6 +437,7 @@ export class PerfexCrm implements INodeType {
 							url: `${baseUrl}/api/${apiVersion}/invoices`,
 							body,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'get') {
 						const invoiceId = this.getNodeParameter('invoiceId', i) as string;
@@ -419,6 +446,7 @@ export class PerfexCrm implements INodeType {
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/invoices/${invoiceId}`,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'getAll') {
 						const returnAll = this.getNodeParameter('returnAll', i);
@@ -439,6 +467,7 @@ export class PerfexCrm implements INodeType {
 							url: `${baseUrl}/api/${apiVersion}/invoices`,
 							qs,
 							json: true,
+							headers,
 						});
 						
 						if (responseData.data) {
@@ -455,6 +484,7 @@ export class PerfexCrm implements INodeType {
 							url: `${baseUrl}/api/${apiVersion}/invoices/${invoiceId}`,
 							body,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'delete') {
 						const invoiceId = this.getNodeParameter('invoiceId', i) as string;
@@ -463,6 +493,7 @@ export class PerfexCrm implements INodeType {
 							method: 'DELETE',
 							url: `${baseUrl}/api/${apiVersion}/invoices/${invoiceId}`,
 							json: true,
+							headers,
 						});
 					}
 				} else if (resource === 'lead') {
@@ -480,6 +511,7 @@ export class PerfexCrm implements INodeType {
 							url: `${baseUrl}/api/${apiVersion}/leads`,
 							body,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'get') {
 						const leadId = this.getNodeParameter('leadId', i) as string;
@@ -488,6 +520,7 @@ export class PerfexCrm implements INodeType {
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/leads/${leadId}`,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'getAll') {
 						const returnAll = this.getNodeParameter('returnAll', i);
@@ -508,6 +541,7 @@ export class PerfexCrm implements INodeType {
 							url: `${baseUrl}/api/${apiVersion}/leads`,
 							qs,
 							json: true,
+							headers,
 						});
 
 						if (responseData.data) {
@@ -524,6 +558,7 @@ export class PerfexCrm implements INodeType {
 							url: `${baseUrl}/api/${apiVersion}/leads/${leadId}`,
 							body,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'delete') {
 						const leadId = this.getNodeParameter('leadId', i) as string;
@@ -532,6 +567,7 @@ export class PerfexCrm implements INodeType {
 							method: 'DELETE',
 							url: `${baseUrl}/api/${apiVersion}/leads/${leadId}`,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'convert') {
 						const leadId = this.getNodeParameter('leadId', i) as string;
@@ -540,6 +576,7 @@ export class PerfexCrm implements INodeType {
 							method: 'POST',
 							url: `${baseUrl}/api/${apiVersion}/leads/${leadId}/convert`,
 							json: true,
+							headers,
 						});
 					}
 				} else if (resource === 'project') {
@@ -559,6 +596,7 @@ export class PerfexCrm implements INodeType {
 							url: `${baseUrl}/api/${apiVersion}/projects`,
 							body,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'get') {
 						const projectId = this.getNodeParameter('projectId', i) as string;
@@ -567,6 +605,7 @@ export class PerfexCrm implements INodeType {
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/projects/${projectId}`,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'getAll') {
 						const returnAll = this.getNodeParameter('returnAll', i);
@@ -587,6 +626,7 @@ export class PerfexCrm implements INodeType {
 							url: `${baseUrl}/api/${apiVersion}/projects`,
 							qs,
 							json: true,
+							headers,
 						});
 
 						if (responseData.data) {
@@ -603,6 +643,7 @@ export class PerfexCrm implements INodeType {
 							url: `${baseUrl}/api/${apiVersion}/projects/${projectId}`,
 							body,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'delete') {
 						const projectId = this.getNodeParameter('projectId', i) as string;
@@ -611,6 +652,7 @@ export class PerfexCrm implements INodeType {
 							method: 'DELETE',
 							url: `${baseUrl}/api/${apiVersion}/projects/${projectId}`,
 							json: true,
+							headers,
 						});
 					}
 				} else if (resource === 'contract') {
@@ -634,6 +676,7 @@ export class PerfexCrm implements INodeType {
 							url: `${baseUrl}/api/${apiVersion}/contracts`,
 							body,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'get') {
 						const contractId = this.getNodeParameter('contractId', i) as string;
@@ -642,6 +685,7 @@ export class PerfexCrm implements INodeType {
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/contracts/${contractId}`,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'getAll') {
 						const returnAll = this.getNodeParameter('returnAll', i);
@@ -662,6 +706,7 @@ export class PerfexCrm implements INodeType {
 							url: `${baseUrl}/api/${apiVersion}/contracts`,
 							qs,
 							json: true,
+							headers,
 						});
 
 						if (responseData.data) {
@@ -678,6 +723,7 @@ export class PerfexCrm implements INodeType {
 							url: `${baseUrl}/api/${apiVersion}/contracts/${contractId}`,
 							body,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'delete') {
 						const contractId = this.getNodeParameter('contractId', i) as string;
@@ -686,6 +732,7 @@ export class PerfexCrm implements INodeType {
 							method: 'DELETE',
 							url: `${baseUrl}/api/${apiVersion}/contracts/${contractId}`,
 							json: true,
+							headers,
 						});
 					} else if (operation === 'sign') {
 						const contractId = this.getNodeParameter('contractId', i) as string;
@@ -702,6 +749,7 @@ export class PerfexCrm implements INodeType {
 							url: `${baseUrl}/api/${apiVersion}/contracts/${contractId}/sign`,
 							body,
 							json: true,
+							headers,
 						});
 					}
 				}

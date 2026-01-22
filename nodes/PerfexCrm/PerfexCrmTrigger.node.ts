@@ -314,6 +314,11 @@ export class PerfexCrmTrigger implements INodeType {
 
 				const baseUrl = credentials.baseUrl as string;
 				const apiVersion = credentials.apiVersion as string;
+				const apiKey = credentials.apiKey as string;
+
+				const headers = {
+					'X-API-KEY': apiKey,
+				};
 
 				// Check if webhook exists
 				if (webhookData.webhookId) {
@@ -322,6 +327,7 @@ export class PerfexCrmTrigger implements INodeType {
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/webhooks/${webhookData.webhookId}`,
 							json: true,
+							headers,
 						});
 						
 						if (response && response.data) {
@@ -344,6 +350,11 @@ export class PerfexCrmTrigger implements INodeType {
 
 				const baseUrl = credentials.baseUrl as string;
 				const apiVersion = credentials.apiVersion as string;
+				const apiKey = credentials.apiKey as string;
+
+				const headers = {
+					'X-API-KEY': apiKey,
+				};
 
 				const body = {
 					name: `n8n-webhook-${this.getWorkflow().id}`,
@@ -358,6 +369,7 @@ export class PerfexCrmTrigger implements INodeType {
 					url: `${baseUrl}/api/${apiVersion}/webhooks`,
 					body,
 					json: true,
+					headers,
 				});
 
 				if (response.data && response.data.id) {
@@ -375,12 +387,18 @@ export class PerfexCrmTrigger implements INodeType {
 				if (webhookData.webhookId) {
 					const baseUrl = credentials.baseUrl as string;
 					const apiVersion = credentials.apiVersion as string;
+					const apiKey = credentials.apiKey as string;
+
+					const headers = {
+						'X-API-KEY': apiKey,
+					};
 
 					try {
 						await this.helpers.request({
 							method: 'DELETE',
 							url: `${baseUrl}/api/${apiVersion}/webhooks/${webhookData.webhookId}`,
 							json: true,
+							headers,
 						});
 					} catch (error) {
 						return false;
