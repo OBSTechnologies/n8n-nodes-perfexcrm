@@ -215,6 +215,23 @@ export const contractFields: INodeProperties[] = [
 		description: 'Max number of results to return',
 	},
 	{
+		displayName: 'Offset',
+		name: 'offset',
+		type: 'number',
+		displayOptions: {
+			show: {
+				resource: ['contract'],
+				operation: ['getAll'],
+				returnAll: [false],
+			},
+		},
+		typeOptions: {
+			minValue: 0,
+		},
+		default: 0,
+		description: 'Number of results to skip before returning results',
+	},
+	{
 		displayName: 'Filters',
 		name: 'filters',
 		type: 'collection',

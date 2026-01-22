@@ -127,6 +127,7 @@ export class PerfexCrm implements INodeType {
 			qs: Record<string, any>,
 			returnAll: boolean,
 			limit: number,
+			offset: number = 0,
 		): Promise<any[]> => {
 			const allData: any[] = [];
 			let page = 1;
@@ -158,12 +159,15 @@ export class PerfexCrm implements INodeType {
 					page++;
 				}
 			} else {
-				// Fetch only up to the specified limit
-				while (allData.length < limit) {
+				// Fetch with limit and offset
+				// Calculate total items needed (offset + limit)
+				const totalNeeded = offset + limit;
+
+				while (allData.length < totalNeeded) {
 					const response = await this.helpers.request({
 						method: 'GET',
 						url,
-						qs: { ...qs, page, limit: Math.min(pageSize, limit - allData.length) },
+						qs: { ...qs, page, limit: Math.min(pageSize, totalNeeded - allData.length) },
 						json: true,
 						headers,
 					});
@@ -175,15 +179,15 @@ export class PerfexCrm implements INodeType {
 
 					allData.push(...data);
 
-					if (data.length < pageSize || allData.length >= limit) {
+					if (data.length < pageSize || allData.length >= totalNeeded) {
 						break;
 					}
 
 					page++;
 				}
 
-				// Trim to exact limit
-				return allData.slice(0, limit);
+				// Apply offset and limit
+				return allData.slice(offset, offset + limit);
 			}
 
 			return allData;
@@ -221,12 +225,14 @@ export class PerfexCrm implements INodeType {
 						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
 						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
 						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+						const offset = returnAll ? 0 : (this.getNodeParameter('offset', i) as number);
 
 						responseData = await fetchAllPaginated(
 							`${baseUrl}/api/${apiVersion}/customers`,
 							filters,
 							returnAll,
 							limit,
+							offset,
 						);
 					} else if (operation === 'update') {
 						const customerId = this.getNodeParameter('customerId', i) as string;
@@ -355,6 +361,7 @@ export class PerfexCrm implements INodeType {
 						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
 						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
 						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+						const offset = returnAll ? 0 : (this.getNodeParameter('offset', i) as number);
 
 						// Build query string with filters
 						const qs: Record<string, any> = {};
@@ -367,6 +374,7 @@ export class PerfexCrm implements INodeType {
 							qs,
 							returnAll,
 							limit,
+							offset,
 						);
 					} else if (operation === 'update') {
 						const ticketId = this.getNodeParameter('ticketId', i) as string;
@@ -489,12 +497,14 @@ export class PerfexCrm implements INodeType {
 						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
 						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
 						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+						const offset = returnAll ? 0 : (this.getNodeParameter('offset', i) as number);
 
 						responseData = await fetchAllPaginated(
 							`${baseUrl}/api/${apiVersion}/invoices`,
 							filters,
 							returnAll,
 							limit,
+							offset,
 						);
 					} else if (operation === 'update') {
 						const invoiceId = this.getNodeParameter('invoiceId', i) as string;
@@ -549,12 +559,14 @@ export class PerfexCrm implements INodeType {
 						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
 						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
 						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+						const offset = returnAll ? 0 : (this.getNodeParameter('offset', i) as number);
 
 						responseData = await fetchAllPaginated(
 							`${baseUrl}/api/${apiVersion}/leads`,
 							filters,
 							returnAll,
 							limit,
+							offset,
 						);
 					} else if (operation === 'update') {
 						const leadId = this.getNodeParameter('leadId', i) as string;
@@ -620,12 +632,14 @@ export class PerfexCrm implements INodeType {
 						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
 						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
 						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+						const offset = returnAll ? 0 : (this.getNodeParameter('offset', i) as number);
 
 						responseData = await fetchAllPaginated(
 							`${baseUrl}/api/${apiVersion}/projects`,
 							filters,
 							returnAll,
 							limit,
+							offset,
 						);
 					} else if (operation === 'update') {
 						const projectId = this.getNodeParameter('projectId', i) as string;
@@ -686,12 +700,14 @@ export class PerfexCrm implements INodeType {
 						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
 						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
 						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+						const offset = returnAll ? 0 : (this.getNodeParameter('offset', i) as number);
 
 						responseData = await fetchAllPaginated(
 							`${baseUrl}/api/${apiVersion}/contracts`,
 							filters,
 							returnAll,
 							limit,
+							offset,
 						);
 					} else if (operation === 'update') {
 						const contractId = this.getNodeParameter('contractId', i) as string;
