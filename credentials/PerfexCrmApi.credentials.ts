@@ -63,15 +63,5 @@ export class PerfexCrmApi implements ICredentialType {
 				'X-API-KEY': '={{$credentials.apiKey}}',
 			},
 		},
-		rules: [
-			{
-				type: 'responseSuccessBody',
-				properties: {
-					key: 'success',
-					value: true,
-					message: 'Authentication successful!',
-				},
-			},
-		],
 	};
 }
