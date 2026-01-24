@@ -139,7 +139,7 @@ export class PerfexCrm implements INodeType {
 					const response = await this.helpers.request({
 						method: 'GET',
 						url,
-						qs: { ...qs, page, limit: pageSize },
+						qs: { ...qs, page, per_page: pageSize },
 						json: true,
 						headers,
 					});
@@ -167,7 +167,7 @@ export class PerfexCrm implements INodeType {
 					const response = await this.helpers.request({
 						method: 'GET',
 						url,
-						qs: { ...qs, page, limit: Math.min(pageSize, totalNeeded - allData.length) },
+						qs: { ...qs, page, per_page: Math.min(pageSize, totalNeeded - allData.length) },
 						json: true,
 						headers,
 					});

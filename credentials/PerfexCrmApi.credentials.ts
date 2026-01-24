@@ -57,7 +57,7 @@ export class PerfexCrmApi implements ICredentialType {
 	test: ICredentialTestRequest = {
 		request: {
 			baseURL: '={{$credentials.baseUrl}}',
-			url: '/api/{{$credentials.apiVersion}}/customers',
+			url: '=/api/{{$credentials.apiVersion}}/customers?per_page=1',
 			method: 'GET',
 			headers: {
 				'X-API-KEY': '={{$credentials.apiKey}}',
