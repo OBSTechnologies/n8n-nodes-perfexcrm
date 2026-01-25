@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-perfexcrm",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "n8n nodes for PerfexCRM API and Webhooks integration",
   "keywords": [
     "n8n-community-node-package",
@@ -11,17 +11,17 @@
     "webhooks"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/obstechnologies/n8n-nodes-perfexcrm",
+  "homepage": "https://github.com/OBSTechnologies/n8n-nodes-perfexcrm",
   "author": {
     "name": "OBS Technologies",
     "email": "support@obstechnologies.com"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/obstechnologies/n8n-nodes-perfexcrm.git"
+    "url": "git+https://github.com/OBSTechnologies/n8n-nodes-perfexcrm.git"
   },
   "bugs": {
-    "url": "https://github.com/obstechnologies/n8n-nodes-perfexcrm/issues"
+    "url": "https://github.com/OBSTechnologies/n8n-nodes-perfexcrm/issues"
   },
   "engines": {
     "node": ">=14.0.0"
