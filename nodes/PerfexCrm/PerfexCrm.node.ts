@@ -3,6 +3,8 @@ import {
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
+	NodeApiError,
+	NodeOperationError,
 } from 'n8n-workflow';
 
 import {
@@ -115,10 +117,64 @@ export class PerfexCrm implements INodeType {
 		const baseUrl = credentials.baseUrl as string;
 		const apiVersion = credentials.apiVersion as string;
 		const apiKey = credentials.apiKey as string;
+		// Configurable page size - PerfexCRM default is 25, max is 100
+		// Can be overridden via PERFEXCRM_PAGE_SIZE env var
+		const pageSize = Math.min(
+			parseInt(process.env.PERFEXCRM_PAGE_SIZE || '25', 10),
+			100 // PerfexCRM max limit
+		);
 
 		// Headers with API key for authentication
 		const headers = {
 			'X-API-KEY': apiKey,
+		};
+
+		// Helper function for standardized response data extraction
+		const extractResponseData = (response: any): any => {
+			// Handle various response formats from PerfexCRM API
+			if (response === null || response === undefined) {
+				return null;
+			}
+			// If response has a data property, extract it
+			if (typeof response === 'object' && 'data' in response) {
+				return response.data;
+			}
+			// Return response as-is if no data wrapper
+			return response;
+		};
+
+		// Helper function for API requests with rate limit retry
+		const makeRequestWithRetry = async (
+			options: any,
+			maxRetries: number = 3
+		): Promise<any> => {
+			let lastError: any;
+			for (let attempt = 0; attempt < maxRetries; attempt++) {
+				try {
+					return await this.helpers.request(options);
+				} catch (error: any) {
+					lastError = error;
+					// Check for rate limit (429 Too Many Requests)
+					const statusCode = error.statusCode || error.response?.statusCode;
+					if (statusCode === 429) {
+						// Get retry delay from Retry-After header or default to 60 seconds
+						const retryAfter = error.response?.headers?.['retry-after'] ||
+							error.response?.body?.retry_after ||
+							60;
+						const delayMs = (parseInt(retryAfter, 10) || 60) * 1000;
+
+						// Only retry if not the last attempt
+						if (attempt < maxRetries - 1) {
+							console.warn(`Rate limited. Retrying after ${retryAfter} seconds (attempt ${attempt + 1}/${maxRetries})`);
+							await new Promise(resolve => setTimeout(resolve, delayMs));
+							continue;
+						}
+					}
+					// Not a rate limit error or last retry, throw
+					throw error;
+				}
+			}
+			throw lastError;
 		};
 
 		// Helper function for paginated requests
@@ -131,12 +187,11 @@ export class PerfexCrm implements INodeType {
 		): Promise<any[]> => {
 			const allData: any[] = [];
 			let page = 1;
-			const pageSize = 100; // Items per page
 
 			if (returnAll) {
 				// Fetch all pages
 				while (true) {
-					const response = await this.helpers.request({
+					const response = await makeRequestWithRetry({
 						method: 'GET',
 						url,
 						qs: { ...qs, page, per_page: pageSize },
@@ -164,7 +219,7 @@ export class PerfexCrm implements INodeType {
 				const totalNeeded = offset + limit;
 
 				while (allData.length < totalNeeded) {
-					const response = await this.helpers.request({
+					const response = await makeRequestWithRetry({
 						method: 'GET',
 						url,
 						qs: { ...qs, page, per_page: Math.min(pageSize, totalNeeded - allData.length) },
@@ -205,7 +260,7 @@ export class PerfexCrm implements INodeType {
 							...additionalFields,
 						};
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'POST',
 							url: `${baseUrl}/api/${apiVersion}/customers`,
 							body,
@@ -215,7 +270,7 @@ export class PerfexCrm implements INodeType {
 					} else if (operation === 'get') {
 						const customerId = this.getNodeParameter('customerId', i) as string;
 						
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}`,
 							json: true,
@@ -240,7 +295,7 @@ export class PerfexCrm implements INodeType {
 						
 						const body = updateFields;
 						
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'PUT',
 							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}`,
 							body,
@@ -250,7 +305,7 @@ export class PerfexCrm implements INodeType {
 					} else if (operation === 'delete') {
 						const customerId = this.getNodeParameter('customerId', i) as string;
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'DELETE',
 							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}`,
 							json: true,
@@ -259,68 +314,53 @@ export class PerfexCrm implements INodeType {
 					} else if (operation === 'getContacts') {
 						const customerId = this.getNodeParameter('customerId', i) as string;
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}/contacts`,
 							json: true,
 							headers,
 						});
-
-						if (responseData.data) {
-							responseData = responseData.data;
-						}
+						responseData = extractResponseData(responseData);
 					} else if (operation === 'getContracts') {
 						const customerId = this.getNodeParameter('customerId', i) as string;
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}/contracts`,
 							json: true,
 							headers,
 						});
-
-						if (responseData.data) {
-							responseData = responseData.data;
-						}
+						responseData = extractResponseData(responseData);
 					} else if (operation === 'getInvoices') {
 						const customerId = this.getNodeParameter('customerId', i) as string;
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}/invoices`,
 							json: true,
 							headers,
 						});
-
-						if (responseData.data) {
-							responseData = responseData.data;
-						}
+						responseData = extractResponseData(responseData);
 					} else if (operation === 'getProjects') {
 						const customerId = this.getNodeParameter('customerId', i) as string;
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}/projects`,
 							json: true,
 							headers,
 						});
-
-						if (responseData.data) {
-							responseData = responseData.data;
-						}
+						responseData = extractResponseData(responseData);
 					} else if (operation === 'getTickets') {
 						const customerId = this.getNodeParameter('customerId', i) as string;
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}/tickets`,
 							json: true,
 							headers,
 						});
-
-						if (responseData.data) {
-							responseData = responseData.data;
-						}
+						responseData = extractResponseData(responseData);
 					}
 				} else if (resource === 'ticket') {
 					if (operation === 'create') {
@@ -334,7 +374,7 @@ export class PerfexCrm implements INodeType {
 							...additionalFields,
 						};
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'POST',
 							url: `${baseUrl}/api/${apiVersion}/tickets`,
 							body,
@@ -350,7 +390,7 @@ export class PerfexCrm implements INodeType {
 							qs.include = 'replies';
 						}
 						
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}`,
 							qs,
@@ -382,7 +422,7 @@ export class PerfexCrm implements INodeType {
 
 						const body = updateFields;
 						
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'PUT',
 							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}`,
 							body,
@@ -392,7 +432,7 @@ export class PerfexCrm implements INodeType {
 					} else if (operation === 'delete') {
 						const ticketId = this.getNodeParameter('ticketId', i) as string;
 						
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'DELETE',
 							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}`,
 							json: true,
@@ -408,7 +448,7 @@ export class PerfexCrm implements INodeType {
 							...additionalFields,
 						};
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'POST',
 							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}/replies`,
 							body,
@@ -419,7 +459,7 @@ export class PerfexCrm implements INodeType {
 						const ticketId = this.getNodeParameter('ticketId', i) as string;
 						const replyId = this.getNodeParameter('replyId', i) as string;
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}/replies/${replyId}`,
 							json: true,
@@ -430,7 +470,7 @@ export class PerfexCrm implements INodeType {
 						const replyId = this.getNodeParameter('replyId', i) as string;
 						const updateFields = this.getNodeParameter('updateFields', i);
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'PUT',
 							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}/replies/${replyId}`,
 							body: updateFields,
@@ -441,7 +481,7 @@ export class PerfexCrm implements INodeType {
 						const ticketId = this.getNodeParameter('ticketId', i) as string;
 						const replyId = this.getNodeParameter('replyId', i) as string;
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'DELETE',
 							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}/replies/${replyId}`,
 							json: true,
@@ -450,16 +490,13 @@ export class PerfexCrm implements INodeType {
 					} else if (operation === 'listReplies') {
 						const ticketId = this.getNodeParameter('ticketId', i) as string;
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}/replies`,
 							json: true,
 							headers,
 						});
-
-						if (responseData.data) {
-							responseData = responseData.data;
-						}
+						responseData = extractResponseData(responseData);
 					}
 				} else if (resource === 'invoice') {
 					if (operation === 'create') {
@@ -477,7 +514,7 @@ export class PerfexCrm implements INodeType {
 							...additionalFields,
 						};
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'POST',
 							url: `${baseUrl}/api/${apiVersion}/invoices`,
 							body,
@@ -487,7 +524,7 @@ export class PerfexCrm implements INodeType {
 					} else if (operation === 'get') {
 						const invoiceId = this.getNodeParameter('invoiceId', i) as string;
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/invoices/${invoiceId}`,
 							json: true,
@@ -512,7 +549,7 @@ export class PerfexCrm implements INodeType {
 
 						const body = updateFields;
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'PUT',
 							url: `${baseUrl}/api/${apiVersion}/invoices/${invoiceId}`,
 							body,
@@ -522,7 +559,7 @@ export class PerfexCrm implements INodeType {
 					} else if (operation === 'delete') {
 						const invoiceId = this.getNodeParameter('invoiceId', i) as string;
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'DELETE',
 							url: `${baseUrl}/api/${apiVersion}/invoices/${invoiceId}`,
 							json: true,
@@ -539,7 +576,7 @@ export class PerfexCrm implements INodeType {
 							...additionalFields,
 						};
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'POST',
 							url: `${baseUrl}/api/${apiVersion}/leads`,
 							body,
@@ -549,7 +586,7 @@ export class PerfexCrm implements INodeType {
 					} else if (operation === 'get') {
 						const leadId = this.getNodeParameter('leadId', i) as string;
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/leads/${leadId}`,
 							json: true,
@@ -574,7 +611,7 @@ export class PerfexCrm implements INodeType {
 
 						const body = updateFields;
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'PUT',
 							url: `${baseUrl}/api/${apiVersion}/leads/${leadId}`,
 							body,
@@ -584,7 +621,7 @@ export class PerfexCrm implements INodeType {
 					} else if (operation === 'delete') {
 						const leadId = this.getNodeParameter('leadId', i) as string;
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'DELETE',
 							url: `${baseUrl}/api/${apiVersion}/leads/${leadId}`,
 							json: true,
@@ -593,7 +630,7 @@ export class PerfexCrm implements INodeType {
 					} else if (operation === 'convert') {
 						const leadId = this.getNodeParameter('leadId', i) as string;
 						
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'POST',
 							url: `${baseUrl}/api/${apiVersion}/leads/${leadId}/convert`,
 							json: true,
@@ -612,7 +649,7 @@ export class PerfexCrm implements INodeType {
 							...additionalFields,
 						};
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'POST',
 							url: `${baseUrl}/api/${apiVersion}/projects`,
 							body,
@@ -622,7 +659,7 @@ export class PerfexCrm implements INodeType {
 					} else if (operation === 'get') {
 						const projectId = this.getNodeParameter('projectId', i) as string;
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/projects/${projectId}`,
 							json: true,
@@ -647,7 +684,7 @@ export class PerfexCrm implements INodeType {
 
 						const body = updateFields;
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'PUT',
 							url: `${baseUrl}/api/${apiVersion}/projects/${projectId}`,
 							body,
@@ -657,7 +694,7 @@ export class PerfexCrm implements INodeType {
 					} else if (operation === 'delete') {
 						const projectId = this.getNodeParameter('projectId', i) as string;
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'DELETE',
 							url: `${baseUrl}/api/${apiVersion}/projects/${projectId}`,
 							json: true,
@@ -680,7 +717,7 @@ export class PerfexCrm implements INodeType {
 							...additionalFields,
 						};
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'POST',
 							url: `${baseUrl}/api/${apiVersion}/contracts`,
 							body,
@@ -690,7 +727,7 @@ export class PerfexCrm implements INodeType {
 					} else if (operation === 'get') {
 						const contractId = this.getNodeParameter('contractId', i) as string;
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/contracts/${contractId}`,
 							json: true,
@@ -715,7 +752,7 @@ export class PerfexCrm implements INodeType {
 
 						const body = updateFields;
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'PUT',
 							url: `${baseUrl}/api/${apiVersion}/contracts/${contractId}`,
 							body,
@@ -725,7 +762,7 @@ export class PerfexCrm implements INodeType {
 					} else if (operation === 'delete') {
 						const contractId = this.getNodeParameter('contractId', i) as string;
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'DELETE',
 							url: `${baseUrl}/api/${apiVersion}/contracts/${contractId}`,
 							json: true,
@@ -741,7 +778,7 @@ export class PerfexCrm implements INodeType {
 							...additionalFields,
 						};
 
-						responseData = await this.helpers.request({
+						responseData = await makeRequestWithRetry({
 							method: 'POST',
 							url: `${baseUrl}/api/${apiVersion}/contracts/${contractId}/sign`,
 							body,
@@ -756,13 +793,48 @@ export class PerfexCrm implements INodeType {
 				} else {
 					returnData.push({ json: responseData });
 				}
-			} catch (error) {
+			} catch (error: any) {
+				// Enhanced error handling with HTTP status codes and context
+				const errorDetails: Record<string, any> = {
+					resource,
+					operation,
+					itemIndex: i,
+				};
+
+				if (error.response) {
+					// HTTP error with response
+					errorDetails.statusCode = error.response.statusCode || error.statusCode;
+					errorDetails.statusMessage = error.response.statusMessage;
+					errorDetails.body = error.response.body;
+				} else if (error.statusCode) {
+					errorDetails.statusCode = error.statusCode;
+				}
+
 				if (this.continueOnFail()) {
 					const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-					returnData.push({ json: { error: errorMessage } });
+					returnData.push({
+						json: {
+							error: errorMessage,
+							...errorDetails,
+						},
+					});
 					continue;
 				}
-				throw error;
+
+				// Throw a more descriptive error using n8n's error types
+				if (error.response || error.statusCode) {
+					throw new NodeApiError(this.getNode(), error, {
+						message: `PerfexCRM API error on ${resource}/${operation}`,
+						description: error.message,
+						httpCode: String(errorDetails.statusCode || 'unknown'),
+					});
+				}
+
+				throw new NodeOperationError(
+					this.getNode(),
+					`Error in ${resource}/${operation}: ${error.message}`,
+					{ itemIndex: i }
+				);
 			}
 		}
 

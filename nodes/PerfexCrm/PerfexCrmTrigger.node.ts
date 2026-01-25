@@ -418,23 +418,42 @@ export class PerfexCrmTrigger implements INodeType {
 		const headers = this.getHeaderData() as IDataObject;
 
 		// Verify webhook signature if secret is configured
+		// PerfexCRM uses X-Webhook-Signature header with SHA256 HMAC
 		if (secret) {
-			const signature = headers['x-webhook-signature'];
+			// PerfexCRM only uses X-Webhook-Signature header (case-insensitive in n8n)
+			const signature = headers['x-webhook-signature'] as string | undefined;
+
 			if (!signature) {
+				console.warn('Webhook signature verification failed: X-Webhook-Signature header not found');
 				return {
 					workflowData: [],
 				};
 			}
 
-			// Verify signature (implementation depends on how PerfexCRM signs webhooks)
-			// This is a placeholder - adjust based on actual implementation
 			const crypto = require('crypto');
+			// PerfexCRM signs the raw JSON body
+			const bodyString = typeof bodyData === 'string' ? bodyData : JSON.stringify(bodyData);
+
+			// Generate expected signature using SHA256 HMAC (PerfexCRM default algorithm)
 			const expectedSignature = crypto
 				.createHmac('sha256', secret)
-				.update(JSON.stringify(bodyData))
+				.update(bodyString)
 				.digest('hex');
 
-			if (signature !== expectedSignature) {
+			// Use timing-safe comparison to prevent timing attacks (same as PerfexCRM's hash_equals)
+			let isValid = false;
+			try {
+				isValid = crypto.timingSafeEqual(
+					Buffer.from(expectedSignature, 'hex'),
+					Buffer.from(signature, 'hex')
+				);
+			} catch {
+				// Buffer lengths don't match or invalid hex
+				isValid = false;
+			}
+
+			if (!isValid) {
+				console.warn('Webhook signature verification failed: Invalid signature');
 				return {
 					workflowData: [],
 				};
