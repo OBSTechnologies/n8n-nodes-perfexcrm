@@ -186,21 +186,35 @@ export class PerfexCrm implements INodeType {
 			offset: number = 0,
 		): Promise<any[]> => {
 			const allData: any[] = [];
-			let page = 1;
+			let currentOffset = 0;
 
 			if (returnAll) {
-				// Fetch all pages
+				// Fetch all records using limit/offset pagination
 				while (true) {
 					const response = await makeRequestWithRetry({
 						method: 'GET',
 						url,
-						qs: { ...qs, page, per_page: pageSize },
+						qs: { ...qs, limit: pageSize, offset: currentOffset },
 						json: true,
 						headers,
 					});
 
-					const data = response.data || response;
-					if (!Array.isArray(data) || data.length === 0) {
+					// Handle different response formats
+					let data: any[];
+					if (Array.isArray(response)) {
+						data = response;
+					} else if (response && Array.isArray(response.data)) {
+						data = response.data;
+					} else if (response && typeof response === 'object') {
+						// Some endpoints return object with different keys
+						const possibleArrayKeys = ['invoices', 'customers', 'tickets', 'leads', 'projects', 'contracts', 'items', 'results'];
+						const arrayKey = possibleArrayKeys.find(key => Array.isArray(response[key]));
+						data = arrayKey ? response[arrayKey] : [];
+					} else {
+						data = [];
+					}
+
+					if (data.length === 0) {
 						break;
 					}
 
@@ -211,38 +225,33 @@ export class PerfexCrm implements INodeType {
 						break;
 					}
 
-					page++;
+					currentOffset += pageSize;
 				}
 			} else {
-				// Fetch with limit and offset
-				// Calculate total items needed (offset + limit)
-				const totalNeeded = offset + limit;
+				// Fetch with user-specified limit and offset
+				const response = await makeRequestWithRetry({
+					method: 'GET',
+					url,
+					qs: { ...qs, limit, offset },
+					json: true,
+					headers,
+				});
 
-				while (allData.length < totalNeeded) {
-					const response = await makeRequestWithRetry({
-						method: 'GET',
-						url,
-						qs: { ...qs, page, per_page: Math.min(pageSize, totalNeeded - allData.length) },
-						json: true,
-						headers,
-					});
-
-					const data = response.data || response;
-					if (!Array.isArray(data) || data.length === 0) {
-						break;
-					}
-
-					allData.push(...data);
-
-					if (data.length < pageSize || allData.length >= totalNeeded) {
-						break;
-					}
-
-					page++;
+				// Handle different response formats
+				let data: any[];
+				if (Array.isArray(response)) {
+					data = response;
+				} else if (response && Array.isArray(response.data)) {
+					data = response.data;
+				} else if (response && typeof response === 'object') {
+					const possibleArrayKeys = ['invoices', 'customers', 'tickets', 'leads', 'projects', 'contracts', 'items', 'results'];
+					const arrayKey = possibleArrayKeys.find(key => Array.isArray(response[key]));
+					data = arrayKey ? response[arrayKey] : [];
+				} else {
+					data = [];
 				}
 
-				// Apply offset and limit
-				return allData.slice(offset, offset + limit);
+				return data;
 			}
 
 			return allData;
@@ -994,17 +1003,38 @@ export class PerfexCrm implements INodeType {
 					itemIndex: i,
 				};
 
+				// Extract detailed error information
+				let errorBody: any = null;
+				let statusCode: number | undefined;
+				let errorMessage = error.message || 'Unknown error';
+
 				if (error.response) {
 					// HTTP error with response
-					errorDetails.statusCode = error.response.statusCode || error.statusCode;
+					statusCode = error.response.statusCode || error.statusCode;
+					errorDetails.statusCode = statusCode;
 					errorDetails.statusMessage = error.response.statusMessage;
-					errorDetails.body = error.response.body;
+					errorBody = error.response.body;
+					errorDetails.body = errorBody;
+
+					// Try to extract error message from response body
+					if (errorBody) {
+						if (typeof errorBody === 'string') {
+							try {
+								const parsed = JSON.parse(errorBody);
+								errorMessage = parsed.message || parsed.error || parsed.status_message || errorBody;
+							} catch {
+								errorMessage = errorBody;
+							}
+						} else if (typeof errorBody === 'object') {
+							errorMessage = errorBody.message || errorBody.error || errorBody.status_message || JSON.stringify(errorBody);
+						}
+					}
 				} else if (error.statusCode) {
-					errorDetails.statusCode = error.statusCode;
+					statusCode = error.statusCode;
+					errorDetails.statusCode = statusCode;
 				}
 
 				if (this.continueOnFail()) {
-					const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 					returnData.push({
 						json: {
 							error: errorMessage,
@@ -1017,15 +1047,15 @@ export class PerfexCrm implements INodeType {
 				// Throw a more descriptive error using n8n's error types
 				if (error.response || error.statusCode) {
 					throw new NodeApiError(this.getNode(), error, {
-						message: `PerfexCRM API error on ${resource}/${operation}`,
-						description: error.message,
-						httpCode: String(errorDetails.statusCode || 'unknown'),
+						message: `PerfexCRM API error on ${resource}/${operation}: ${errorMessage}`,
+						description: `HTTP ${statusCode || 'unknown'}: ${errorMessage}`,
+						httpCode: String(statusCode || 'unknown'),
 					});
 				}
 
 				throw new NodeOperationError(
 					this.getNode(),
-					`Error in ${resource}/${operation}: ${error.message}`,
+					`Error in ${resource}/${operation}: ${errorMessage}`,
 					{ itemIndex: i }
 				);
 			}
