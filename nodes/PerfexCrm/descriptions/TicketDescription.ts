@@ -337,35 +337,10 @@ export const ticketFields: INodeProperties[] = [
 			{
 				displayName: 'Status',
 				name: 'status',
-				type: 'options',
-				options: [
-					{
-						name: 'All',
-						value: '',
-					},
-					{
-						name: 'Open',
-						value: 'open',
-					},
-					{
-						name: 'In Progress',
-						value: '2',
-					},
-					{
-						name: 'Answered',
-						value: '3',
-					},
-					{
-						name: 'On Hold',
-						value: '4',
-					},
-					{
-						name: 'Closed',
-						value: '5',
-					},
-				],
+				type: 'string',
 				default: '',
-				description: 'Filter by status',
+				placeholder: 'e.g. 1',
+				description: 'Filter by status ID. Defaults: 1=Open, 2=In Progress, 3=Answered, 4=On Hold, 5=Closed. Custom statuses use ID 6+. Leave empty for all.',
 			},
 			{
 				displayName: 'Department',
@@ -377,31 +352,10 @@ export const ticketFields: INodeProperties[] = [
 			{
 				displayName: 'Priority',
 				name: 'priority',
-				type: 'options',
-				options: [
-					{
-						name: 'All',
-						value: '',
-					},
-					{
-						name: 'Low',
-						value: '1',
-					},
-					{
-						name: 'Medium',
-						value: '2',
-					},
-					{
-						name: 'High',
-						value: '3',
-					},
-					{
-						name: 'Urgent',
-						value: '4',
-					},
-				],
+				type: 'string',
 				default: '',
-				description: 'Filter by priority',
+				placeholder: 'e.g. 1',
+				description: 'Filter by priority ID. Defaults: 1=Low, 2=Medium, 3=High, 4=Urgent. Custom priorities use ID 5+. Leave empty for all.',
 			},
 			{
 				displayName: 'Customer ID',
