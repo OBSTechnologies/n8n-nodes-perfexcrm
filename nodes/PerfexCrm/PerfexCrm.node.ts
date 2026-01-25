@@ -178,41 +178,45 @@ export class PerfexCrm implements INodeType {
 		};
 
 		// Helper function for paginated requests
+		// PerfexCRM API uses page/limit pagination (not offset/limit)
 		const fetchAllPaginated = async (
 			url: string,
 			qs: Record<string, any>,
 			returnAll: boolean,
-			limit: number,
-			offset: number = 0,
+			userLimit: number,
+			userOffset: number = 0,
 		): Promise<any[]> => {
 			const allData: any[] = [];
-			let currentOffset = 0;
+			let currentPage = 1;
+			const apiLimit = Math.min(pageSize, 100); // PerfexCRM caps at 100
+
+			// Helper to extract data array from response
+			const extractData = (response: any): any[] => {
+				if (Array.isArray(response)) {
+					return response;
+				} else if (response && Array.isArray(response.data)) {
+					return response.data;
+				} else if (response && typeof response === 'object') {
+					// Some endpoints return object with different keys
+					const possibleArrayKeys = ['invoices', 'customers', 'tickets', 'leads', 'projects', 'contracts', 'items', 'results'];
+					const arrayKey = possibleArrayKeys.find(key => Array.isArray(response[key]));
+					return arrayKey ? response[arrayKey] : [];
+				}
+				return [];
+			};
 
 			if (returnAll) {
-				// Fetch all records using limit/offset pagination
+				// Fetch all records using page/limit pagination
 				while (true) {
 					const response = await makeRequestWithRetry({
 						method: 'GET',
 						url,
-						qs: { ...qs, limit: pageSize, offset: currentOffset },
+						qs: { ...qs, page: currentPage, limit: apiLimit },
 						json: true,
 						headers,
 					});
 
-					// Handle different response formats
-					let data: any[];
-					if (Array.isArray(response)) {
-						data = response;
-					} else if (response && Array.isArray(response.data)) {
-						data = response.data;
-					} else if (response && typeof response === 'object') {
-						// Some endpoints return object with different keys
-						const possibleArrayKeys = ['invoices', 'customers', 'tickets', 'leads', 'projects', 'contracts', 'items', 'results'];
-						const arrayKey = possibleArrayKeys.find(key => Array.isArray(response[key]));
-						data = arrayKey ? response[arrayKey] : [];
-					} else {
-						data = [];
-					}
+					const data = extractData(response);
 
 					if (data.length === 0) {
 						break;
@@ -220,38 +224,55 @@ export class PerfexCrm implements INodeType {
 
 					allData.push(...data);
 
-					// If we got less than pageSize, we've reached the end
-					if (data.length < pageSize) {
+					// If we got less than requested, we've reached the end
+					if (data.length < apiLimit) {
 						break;
 					}
 
-					currentOffset += pageSize;
+					currentPage++;
 				}
 			} else {
 				// Fetch with user-specified limit and offset
-				const response = await makeRequestWithRetry({
-					method: 'GET',
-					url,
-					qs: { ...qs, limit, offset },
-					json: true,
-					headers,
-				});
+				// Convert offset to page number: page = floor(offset / limit) + 1
+				const startPage = Math.floor(userOffset / apiLimit) + 1;
+				const skipInFirstPage = userOffset % apiLimit;
+				let itemsNeeded = userLimit;
+				let isFirstPage = true;
+				currentPage = startPage;
 
-				// Handle different response formats
-				let data: any[];
-				if (Array.isArray(response)) {
-					data = response;
-				} else if (response && Array.isArray(response.data)) {
-					data = response.data;
-				} else if (response && typeof response === 'object') {
-					const possibleArrayKeys = ['invoices', 'customers', 'tickets', 'leads', 'projects', 'contracts', 'items', 'results'];
-					const arrayKey = possibleArrayKeys.find(key => Array.isArray(response[key]));
-					data = arrayKey ? response[arrayKey] : [];
-				} else {
-					data = [];
+				while (itemsNeeded > 0) {
+					const response = await makeRequestWithRetry({
+						method: 'GET',
+						url,
+						qs: { ...qs, page: currentPage, limit: apiLimit },
+						json: true,
+						headers,
+					});
+
+					let data = extractData(response);
+
+					if (data.length === 0) {
+						break;
+					}
+
+					// Skip items in first page if offset doesn't align with page boundary
+					if (isFirstPage && skipInFirstPage > 0) {
+						data = data.slice(skipInFirstPage);
+						isFirstPage = false;
+					}
+
+					// Take only what we need
+					const itemsToTake = Math.min(data.length, itemsNeeded);
+					allData.push(...data.slice(0, itemsToTake));
+					itemsNeeded -= itemsToTake;
+
+					// If we got less than apiLimit, we've reached the end
+					if (data.length < apiLimit) {
+						break;
+					}
+
+					currentPage++;
 				}
-
-				return data;
 			}
 
 			return allData;
