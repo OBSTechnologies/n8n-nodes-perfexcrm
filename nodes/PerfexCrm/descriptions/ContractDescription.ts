@@ -31,10 +31,40 @@ export const contractOperations: INodeProperties[] = [
 				action: 'Get a contract',
 			},
 			{
+				name: 'Get Attachments',
+				value: 'getAttachments',
+				description: 'Get all attachments for a contract',
+				action: 'Get attachments for contract',
+			},
+			{
+				name: 'Get Comments',
+				value: 'getComments',
+				description: 'Get all comments for a contract',
+				action: 'Get comments for contract',
+			},
+			{
+				name: 'Get Expired',
+				value: 'getExpired',
+				description: 'Get all expired contracts',
+				action: 'Get expired contracts',
+			},
+			{
+				name: 'Get Expiring',
+				value: 'getExpiring',
+				description: 'Get contracts expiring soon',
+				action: 'Get expiring contracts',
+			},
+			{
 				name: 'Get Many',
 				value: 'getAll',
 				description: 'Get many contracts',
 				action: 'Get many contracts',
+			},
+			{
+				name: 'Renew',
+				value: 'renew',
+				description: 'Renew an expired or expiring contract',
+				action: 'Renew a contract',
 			},
 			{
 				name: 'Sign',
@@ -431,6 +461,121 @@ export const contractFields: INodeProperties[] = [
 				type: 'string',
 				default: '',
 				description: 'Email of the person signing',
+			},
+		],
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                            contract:getAttachments                         */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Contract ID',
+		name: 'contractId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['contract'],
+				operation: ['getAttachments'],
+			},
+		},
+		description: 'The ID of the contract',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                             contract:getComments                           */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Contract ID',
+		name: 'contractId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['contract'],
+				operation: ['getComments'],
+			},
+		},
+		description: 'The ID of the contract',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                             contract:getExpiring                           */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Days',
+		name: 'days',
+		type: 'number',
+		required: false,
+		default: 30,
+		displayOptions: {
+			show: {
+				resource: ['contract'],
+				operation: ['getExpiring'],
+			},
+		},
+		description: 'Number of days to look ahead for expiring contracts (default: 30)',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                               contract:renew                               */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Contract ID',
+		name: 'contractId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['contract'],
+				operation: ['renew'],
+			},
+		},
+		description: 'The ID of the contract to renew',
+	},
+	{
+		displayName: 'New End Date',
+		name: 'newEndDate',
+		type: 'dateTime',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['contract'],
+				operation: ['renew'],
+			},
+		},
+		description: 'The new end date for the renewed contract',
+	},
+	{
+		displayName: 'Additional Fields',
+		name: 'additionalFields',
+		type: 'collection',
+		placeholder: 'Add Field',
+		default: {},
+		displayOptions: {
+			show: {
+				resource: ['contract'],
+				operation: ['renew'],
+			},
+		},
+		options: [
+			{
+				displayName: 'New Start Date',
+				name: 'new_start_date',
+				type: 'dateTime',
+				default: '',
+				description: 'The new start date for the renewed contract (defaults to current date)',
+			},
+			{
+				displayName: 'New Value',
+				name: 'new_value',
+				type: 'number',
+				default: 0,
+				description: 'New contract value for the renewed contract',
 			},
 		],
 	},

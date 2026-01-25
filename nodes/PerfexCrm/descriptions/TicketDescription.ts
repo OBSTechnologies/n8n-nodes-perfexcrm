@@ -19,6 +19,18 @@ export const ticketOperations: INodeProperties[] = [
 				action: 'Add reply to ticket',
 			},
 			{
+				name: 'Assign',
+				value: 'assign',
+				description: 'Assign a ticket to a staff member',
+				action: 'Assign a ticket',
+			},
+			{
+				name: 'Change Status',
+				value: 'changeStatus',
+				description: 'Change the status of a ticket',
+				action: 'Change ticket status',
+			},
+			{
 				name: 'Create',
 				value: 'create',
 				description: 'Create a new ticket',
@@ -41,6 +53,18 @@ export const ticketOperations: INodeProperties[] = [
 				value: 'get',
 				description: 'Get a ticket',
 				action: 'Get a ticket',
+			},
+			{
+				name: 'Get Attachments',
+				value: 'getAttachments',
+				description: 'Get all attachments from a ticket',
+				action: 'Get attachments from ticket',
+			},
+			{
+				name: 'Get History',
+				value: 'getHistory',
+				description: 'Get the history/activity log of a ticket',
+				action: 'Get ticket history',
 			},
 			{
 				name: 'Get Many',
@@ -269,6 +293,42 @@ export const ticketFields: INodeProperties[] = [
 				description: 'Whether to include ticket replies',
 			},
 		],
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                            ticket:getAttachments                          */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Ticket ID',
+		name: 'ticketId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
+				operation: ['getAttachments'],
+			},
+		},
+		description: 'The ID of the ticket',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                              ticket:getHistory                            */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Ticket ID',
+		name: 'ticketId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
+				operation: ['getHistory'],
+			},
+		},
+		description: 'The ID of the ticket',
 	},
 
 	/* -------------------------------------------------------------------------- */
@@ -704,5 +764,91 @@ export const ticketFields: INodeProperties[] = [
 			},
 		},
 		description: 'The ID of the ticket',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                                ticket:assign                               */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Ticket ID',
+		name: 'ticketId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
+				operation: ['assign'],
+			},
+		},
+		description: 'The ID of the ticket',
+	},
+	{
+		displayName: 'Staff ID',
+		name: 'staffId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
+				operation: ['assign'],
+			},
+		},
+		description: 'The ID of the staff member to assign the ticket to',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                             ticket:changeStatus                            */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Ticket ID',
+		name: 'ticketId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
+				operation: ['changeStatus'],
+			},
+		},
+		description: 'The ID of the ticket',
+	},
+	{
+		displayName: 'Status',
+		name: 'status',
+		type: 'options',
+		required: true,
+		options: [
+			{
+				name: 'Open',
+				value: 1,
+			},
+			{
+				name: 'In Progress',
+				value: 2,
+			},
+			{
+				name: 'Answered',
+				value: 3,
+			},
+			{
+				name: 'On Hold',
+				value: 4,
+			},
+			{
+				name: 'Closed',
+				value: 5,
+			},
+		],
+		default: 1,
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
+				operation: ['changeStatus'],
+			},
+		},
+		description: 'The new status for the ticket',
 	},
 ];

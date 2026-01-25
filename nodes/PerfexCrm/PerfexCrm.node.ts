@@ -497,6 +497,48 @@ export class PerfexCrm implements INodeType {
 							headers,
 						});
 						responseData = extractResponseData(responseData);
+					} else if (operation === 'getAttachments') {
+						const ticketId = this.getNodeParameter('ticketId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}/attachments`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'getHistory') {
+						const ticketId = this.getNodeParameter('ticketId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}/history`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'assign') {
+						const ticketId = this.getNodeParameter('ticketId', i) as string;
+						const staffId = this.getNodeParameter('staffId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'PUT',
+							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}/assign`,
+							body: { staff_id: staffId },
+							json: true,
+							headers,
+						});
+					} else if (operation === 'changeStatus') {
+						const ticketId = this.getNodeParameter('ticketId', i) as string;
+						const status = this.getNodeParameter('status', i) as number;
+
+						responseData = await makeRequestWithRetry({
+							method: 'PUT',
+							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}/status`,
+							body: { status },
+							json: true,
+							headers,
+						});
 					}
 				} else if (resource === 'invoice') {
 					if (operation === 'create') {
@@ -565,6 +607,35 @@ export class PerfexCrm implements INodeType {
 							json: true,
 							headers,
 						});
+					} else if (operation === 'getPayments') {
+						const invoiceId = this.getNodeParameter('invoiceId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/invoices/${invoiceId}/payments`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'send') {
+						const invoiceId = this.getNodeParameter('invoiceId', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, any>;
+
+						const body: any = {};
+						if (additionalFields.cc) {
+							body.cc = additionalFields.cc;
+						}
+						if (additionalFields.template) {
+							body.template = additionalFields.template;
+						}
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/invoices/${invoiceId}/send`,
+							body,
+							json: true,
+							headers,
+						});
 					}
 				} else if (resource === 'lead') {
 					if (operation === 'create') {
@@ -629,13 +700,33 @@ export class PerfexCrm implements INodeType {
 						});
 					} else if (operation === 'convert') {
 						const leadId = this.getNodeParameter('leadId', i) as string;
-						
+
 						responseData = await makeRequestWithRetry({
 							method: 'POST',
 							url: `${baseUrl}/api/${apiVersion}/leads/${leadId}/convert`,
 							json: true,
 							headers,
 						});
+					} else if (operation === 'getActivities') {
+						const leadId = this.getNodeParameter('leadId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/leads/${leadId}/activities`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'getNotes') {
+						const leadId = this.getNodeParameter('leadId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/leads/${leadId}/notes`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
 					}
 				} else if (resource === 'project') {
 					if (operation === 'create') {
@@ -700,6 +791,46 @@ export class PerfexCrm implements INodeType {
 							json: true,
 							headers,
 						});
+					} else if (operation === 'getActivity') {
+						const projectId = this.getNodeParameter('projectId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/projects/${projectId}/activity`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'getFiles') {
+						const projectId = this.getNodeParameter('projectId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/projects/${projectId}/files`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'getMilestones') {
+						const projectId = this.getNodeParameter('projectId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/projects/${projectId}/milestones`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'getTasks') {
+						const projectId = this.getNodeParameter('projectId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/projects/${projectId}/tasks`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
 					}
 				} else if (resource === 'contract') {
 					if (operation === 'create') {
@@ -781,6 +912,68 @@ export class PerfexCrm implements INodeType {
 						responseData = await makeRequestWithRetry({
 							method: 'POST',
 							url: `${baseUrl}/api/${apiVersion}/contracts/${contractId}/sign`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'getAttachments') {
+						const contractId = this.getNodeParameter('contractId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/contracts/${contractId}/attachments`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'getComments') {
+						const contractId = this.getNodeParameter('contractId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/contracts/${contractId}/comments`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'getExpired') {
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/contracts/expired`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'getExpiring') {
+						const days = this.getNodeParameter('days', i, 30) as number;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/contracts/expiring`,
+							qs: { days },
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'renew') {
+						const contractId = this.getNodeParameter('contractId', i) as string;
+						const newEndDate = this.getNodeParameter('newEndDate', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, any>;
+
+						const body: any = {
+							dateend: newEndDate,
+						};
+
+						if (additionalFields.new_start_date) {
+							body.datestart = additionalFields.new_start_date;
+						}
+						if (additionalFields.new_value) {
+							body.contract_value = additionalFields.new_value;
+						}
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/contracts/${contractId}/renew`,
 							body,
 							json: true,
 							headers,

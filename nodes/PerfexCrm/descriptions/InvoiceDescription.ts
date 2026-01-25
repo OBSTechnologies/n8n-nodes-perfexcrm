@@ -37,6 +37,18 @@ export const invoiceOperations: INodeProperties[] = [
 				action: 'Get many invoices',
 			},
 			{
+				name: 'Get Payments',
+				value: 'getPayments',
+				description: 'Get all payments for an invoice',
+				action: 'Get payments for invoice',
+			},
+			{
+				name: 'Send',
+				value: 'send',
+				description: 'Send an invoice to the client via email',
+				action: 'Send an invoice',
+			},
+			{
 				name: 'Update',
 				value: 'update',
 				description: 'Update an invoice',
@@ -328,6 +340,71 @@ export const invoiceFields: INodeProperties[] = [
 				],
 				default: '',
 				description: 'Filter by status',
+			},
+		],
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                              invoice:getPayments                           */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Invoice ID',
+		name: 'invoiceId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['invoice'],
+				operation: ['getPayments'],
+			},
+		},
+		description: 'The ID of the invoice',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                                invoice:send                                */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Invoice ID',
+		name: 'invoiceId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['invoice'],
+				operation: ['send'],
+			},
+		},
+		description: 'The ID of the invoice to send',
+	},
+	{
+		displayName: 'Additional Fields',
+		name: 'additionalFields',
+		type: 'collection',
+		placeholder: 'Add Field',
+		default: {},
+		displayOptions: {
+			show: {
+				resource: ['invoice'],
+				operation: ['send'],
+			},
+		},
+		options: [
+			{
+				displayName: 'CC',
+				name: 'cc',
+				type: 'string',
+				default: '',
+				description: 'CC email addresses (comma-separated)',
+			},
+			{
+				displayName: 'Template',
+				name: 'template',
+				type: 'string',
+				default: '',
+				description: 'Email template name/ID to use',
 			},
 		],
 	},

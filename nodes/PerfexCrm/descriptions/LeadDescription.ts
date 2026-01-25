@@ -37,10 +37,22 @@ export const leadOperations: INodeProperties[] = [
 				action: 'Get a lead',
 			},
 			{
+				name: 'Get Activities',
+				value: 'getActivities',
+				description: 'Get all activities for a lead',
+				action: 'Get activities for lead',
+			},
+			{
 				name: 'Get Many',
 				value: 'getAll',
 				description: 'Get many leads',
 				action: 'Get many leads',
+			},
+			{
+				name: 'Get Notes',
+				value: 'getNotes',
+				description: 'Get all notes for a lead',
+				action: 'Get notes for lead',
 			},
 			{
 				name: 'Update',
@@ -214,6 +226,24 @@ export const leadFields: INodeProperties[] = [
 	},
 
 	/* -------------------------------------------------------------------------- */
+	/*                             lead:getActivities                             */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Lead ID',
+		name: 'leadId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['lead'],
+				operation: ['getActivities'],
+			},
+		},
+		description: 'The ID of the lead',
+	},
+
+	/* -------------------------------------------------------------------------- */
 	/*                                lead:getAll                                 */
 	/* -------------------------------------------------------------------------- */
 	{
@@ -305,6 +335,24 @@ export const leadFields: INodeProperties[] = [
 				description: 'Search term',
 			},
 		],
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                               lead:getNotes                                */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Lead ID',
+		name: 'leadId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['lead'],
+				operation: ['getNotes'],
+			},
+		},
+		description: 'The ID of the lead',
 	},
 
 	/* -------------------------------------------------------------------------- */

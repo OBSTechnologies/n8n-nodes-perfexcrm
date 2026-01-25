@@ -31,10 +31,34 @@ export const projectOperations: INodeProperties[] = [
 				action: 'Get a project',
 			},
 			{
+				name: 'Get Activity',
+				value: 'getActivity',
+				description: 'Get activity log for a project',
+				action: 'Get activity for project',
+			},
+			{
+				name: 'Get Files',
+				value: 'getFiles',
+				description: 'Get all files for a project',
+				action: 'Get files for project',
+			},
+			{
 				name: 'Get Many',
 				value: 'getAll',
 				description: 'Get many projects',
 				action: 'Get many projects',
+			},
+			{
+				name: 'Get Milestones',
+				value: 'getMilestones',
+				description: 'Get all milestones for a project',
+				action: 'Get milestones for project',
+			},
+			{
+				name: 'Get Tasks',
+				value: 'getTasks',
+				description: 'Get all tasks for a project',
+				action: 'Get tasks for project',
 			},
 			{
 				name: 'Update',
@@ -509,6 +533,78 @@ export const projectFields: INodeProperties[] = [
 			show: {
 				resource: ['project'],
 				operation: ['delete'],
+			},
+		},
+		description: 'The ID of the project',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                              project:getActivity                           */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Project ID',
+		name: 'projectId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['project'],
+				operation: ['getActivity'],
+			},
+		},
+		description: 'The ID of the project',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                               project:getFiles                             */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Project ID',
+		name: 'projectId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['project'],
+				operation: ['getFiles'],
+			},
+		},
+		description: 'The ID of the project',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                             project:getMilestones                          */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Project ID',
+		name: 'projectId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['project'],
+				operation: ['getMilestones'],
+			},
+		},
+		description: 'The ID of the project',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                               project:getTasks                             */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Project ID',
+		name: 'projectId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['project'],
+				operation: ['getTasks'],
 			},
 		},
 		description: 'The ID of the project',
