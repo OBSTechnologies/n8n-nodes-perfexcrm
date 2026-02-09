@@ -8,6 +8,16 @@ import {
 } from 'n8n-workflow';
 
 import {
+	validateAndFormatDate,
+	validateEmail,
+	validateNonNegativeNumber,
+	validateNumericId,
+	validateAndFormatDateFields,
+	validateEmailFields,
+	validateNonNegativeFields,
+} from './helpers/validation';
+
+import {
 	customerFields,
 	customerOperations,
 } from './descriptions/CustomerDescription';
@@ -283,8 +293,11 @@ export class PerfexCrm implements INodeType {
 				if (resource === 'customer') {
 					if (operation === 'create') {
 						const company = this.getNodeParameter('company', i) as string;
-						const additionalFields = this.getNodeParameter('additionalFields', i);
-						
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						// Validate email if provided
+						validateEmailFields(this.getNode(), additionalFields, ['email'], i);
+
 						const body: any = {
 							company,
 							...additionalFields,
@@ -321,10 +334,13 @@ export class PerfexCrm implements INodeType {
 						);
 					} else if (operation === 'update') {
 						const customerId = this.getNodeParameter('customerId', i) as string;
-						const updateFields = this.getNodeParameter('updateFields', i);
-						
+						const updateFields = this.getNodeParameter('updateFields', i) as Record<string, unknown>;
+
+						// Validate email if provided
+						validateEmailFields(this.getNode(), updateFields, ['email'], i);
+
 						const body = updateFields;
-						
+
 						responseData = await makeRequestWithRetry({
 							method: 'PUT',
 							url: `${baseUrl}/api/${apiVersion}/customers/${customerId}`,
@@ -396,8 +412,11 @@ export class PerfexCrm implements INodeType {
 					if (operation === 'create') {
 						const subject = this.getNodeParameter('subject', i) as string;
 						const department = this.getNodeParameter('department', i) as string;
-						const additionalFields = this.getNodeParameter('additionalFields', i);
-						
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						// Validate email if provided
+						validateEmailFields(this.getNode(), additionalFields, ['email'], i);
+
 						const body: any = {
 							subject,
 							department,
@@ -471,7 +490,10 @@ export class PerfexCrm implements INodeType {
 					} else if (operation === 'addReply') {
 						const ticketId = this.getNodeParameter('ticketId', i) as string;
 						const message = this.getNodeParameter('message', i) as string;
-						const additionalFields = this.getNodeParameter('additionalFields', i);
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						// Validate email if provided
+						validateEmailFields(this.getNode(), additionalFields, ['email'], i);
 
 						const body: any = {
 							message,
@@ -576,13 +598,20 @@ export class PerfexCrm implements INodeType {
 						const number = this.getNodeParameter('number', i) as string;
 						const date = this.getNodeParameter('date', i) as string;
 						const duedate = this.getNodeParameter('duedate', i) as string;
-						const additionalFields = this.getNodeParameter('additionalFields', i);
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						// Validate and normalize dates
+						const normalizedDate = validateAndFormatDate(this.getNode(), date, 'Date', i);
+						const normalizedDueDate = validateAndFormatDate(this.getNode(), duedate, 'Due Date', i);
+
+						// Validate monetary fields
+						validateNonNegativeFields(this.getNode(), additionalFields, ['total', 'subtotal'], i);
 
 						const body: any = {
 							clientid: clientId,
 							number,
-							date,
-							duedate,
+							date: normalizedDate,
+							duedate: normalizedDueDate,
 							...additionalFields,
 						};
 
@@ -617,7 +646,13 @@ export class PerfexCrm implements INodeType {
 						);
 					} else if (operation === 'update') {
 						const invoiceId = this.getNodeParameter('invoiceId', i) as string;
-						const updateFields = this.getNodeParameter('updateFields', i);
+						const updateFields = this.getNodeParameter('updateFields', i) as Record<string, unknown>;
+
+						// Validate and normalize date fields if provided
+						validateAndFormatDateFields(this.getNode(), updateFields, ['date', 'duedate'], i);
+
+						// Validate monetary fields
+						validateNonNegativeFields(this.getNode(), updateFields, ['total', 'subtotal'], i);
 
 						const body = updateFields;
 
@@ -670,8 +705,12 @@ export class PerfexCrm implements INodeType {
 				} else if (resource === 'lead') {
 					if (operation === 'create') {
 						const name = this.getNodeParameter('name', i) as string;
-						const additionalFields = this.getNodeParameter('additionalFields', i);
-						
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						// Validate email and lead value if provided
+						validateEmailFields(this.getNode(), additionalFields, ['email'], i);
+						validateNonNegativeFields(this.getNode(), additionalFields, ['lead_value'], i);
+
 						const body: any = {
 							name,
 							...additionalFields,
@@ -708,7 +747,11 @@ export class PerfexCrm implements INodeType {
 						);
 					} else if (operation === 'update') {
 						const leadId = this.getNodeParameter('leadId', i) as string;
-						const updateFields = this.getNodeParameter('updateFields', i);
+						const updateFields = this.getNodeParameter('updateFields', i) as Record<string, unknown>;
+
+						// Validate email and lead value if provided
+						validateEmailFields(this.getNode(), updateFields, ['email'], i);
+						validateNonNegativeFields(this.getNode(), updateFields, ['lead_value'], i);
 
 						const body = updateFields;
 
@@ -762,7 +805,13 @@ export class PerfexCrm implements INodeType {
 					if (operation === 'create') {
 						const name = this.getNodeParameter('name', i) as string;
 						const clientId = this.getNodeParameter('clientId', i) as string;
-						const additionalFields = this.getNodeParameter('additionalFields', i);
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						// Validate and normalize date fields if provided
+						validateAndFormatDateFields(this.getNode(), additionalFields, ['start_date', 'deadline'], i);
+
+						// Validate monetary/numeric fields
+						validateNonNegativeFields(this.getNode(), additionalFields, ['project_cost', 'project_rate_per_hour', 'estimated_hours'], i);
 
 						const body: any = {
 							name,
@@ -801,7 +850,13 @@ export class PerfexCrm implements INodeType {
 						);
 					} else if (operation === 'update') {
 						const projectId = this.getNodeParameter('projectId', i) as string;
-						const updateFields = this.getNodeParameter('updateFields', i);
+						const updateFields = this.getNodeParameter('updateFields', i) as Record<string, unknown>;
+
+						// Validate and normalize date fields if provided
+						validateAndFormatDateFields(this.getNode(), updateFields, ['start_date', 'deadline'], i);
+
+						// Validate monetary/numeric fields
+						validateNonNegativeFields(this.getNode(), updateFields, ['project_cost', 'project_rate_per_hour', 'estimated_hours'], i);
 
 						const body = updateFields;
 
@@ -868,13 +923,20 @@ export class PerfexCrm implements INodeType {
 						const client = this.getNodeParameter('client', i) as string;
 						const datestart = this.getNodeParameter('datestart', i) as string;
 						const dateend = this.getNodeParameter('dateend', i) as string;
-						const additionalFields = this.getNodeParameter('additionalFields', i);
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						// Validate and normalize dates
+						const normalizedStart = validateAndFormatDate(this.getNode(), datestart, 'Start Date', i);
+						const normalizedEnd = validateAndFormatDate(this.getNode(), dateend, 'End Date', i);
+
+						// Validate monetary fields
+						validateNonNegativeFields(this.getNode(), additionalFields, ['contract_value'], i);
 
 						const body: any = {
 							subject,
 							client,
-							datestart,
-							dateend,
+							datestart: normalizedStart,
+							dateend: normalizedEnd,
 							...additionalFields,
 						};
 
@@ -909,7 +971,13 @@ export class PerfexCrm implements INodeType {
 						);
 					} else if (operation === 'update') {
 						const contractId = this.getNodeParameter('contractId', i) as string;
-						const updateFields = this.getNodeParameter('updateFields', i);
+						const updateFields = this.getNodeParameter('updateFields', i) as Record<string, unknown>;
+
+						// Validate and normalize date fields if provided
+						validateAndFormatDateFields(this.getNode(), updateFields, ['datestart', 'dateend'], i);
+
+						// Validate monetary fields
+						validateNonNegativeFields(this.getNode(), updateFields, ['contract_value'], i);
 
 						const body = updateFields;
 
@@ -932,7 +1000,10 @@ export class PerfexCrm implements INodeType {
 					} else if (operation === 'sign') {
 						const contractId = this.getNodeParameter('contractId', i) as string;
 						const signature = this.getNodeParameter('signature', i) as string;
-						const additionalFields = this.getNodeParameter('additionalFields', i);
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						// Validate signer email if provided
+						validateEmailFields(this.getNode(), additionalFields, ['signer_email'], i);
 
 						const body: any = {
 							signature,
@@ -988,10 +1059,17 @@ export class PerfexCrm implements INodeType {
 					} else if (operation === 'renew') {
 						const contractId = this.getNodeParameter('contractId', i) as string;
 						const newEndDate = this.getNodeParameter('newEndDate', i) as string;
-						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, any>;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						// Validate and normalize dates
+						const normalizedEndDate = validateAndFormatDate(this.getNode(), newEndDate, 'New End Date', i);
+
+						// Validate new_start_date and new_value if provided
+						validateAndFormatDateFields(this.getNode(), additionalFields, ['new_start_date'], i);
+						validateNonNegativeFields(this.getNode(), additionalFields, ['new_value'], i);
 
 						const body: any = {
-							dateend: newEndDate,
+							dateend: normalizedEndDate,
 						};
 
 						if (additionalFields.new_start_date) {
