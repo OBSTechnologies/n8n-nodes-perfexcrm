@@ -1390,6 +1390,15 @@ export class PerfexCrm implements INodeType {
 							json: true,
 							headers,
 						});
+					} else if (operation === 'getPdf') {
+						const estimateId = this.getNodeParameter('estimateId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/estimates/${estimateId}/pdf`,
+							json: true,
+							headers,
+						});
 					}
 				} else if (resource === 'staff') {
 					if (operation === 'create') {
@@ -1545,6 +1554,54 @@ export class PerfexCrm implements INodeType {
 							headers,
 						});
 						responseData = extractResponseData(responseData);
+					} else if (operation === 'changePassword') {
+						const staffId = this.getNodeParameter('staffId', i) as string;
+						const newPassword = this.getNodeParameter('newPassword', i) as string;
+						const confirmPassword = this.getNodeParameter('confirmPassword', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/staff/${staffId}/change-password`,
+							body: { new_password: newPassword, confirm_password: confirmPassword },
+							json: true,
+							headers,
+						});
+					} else if (operation === 'getTasks') {
+						const staffId = this.getNodeParameter('staffId', i) as string;
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+
+						const qs: Record<string, any> = {};
+						for (const [key, value] of Object.entries(filters)) {
+							if (value !== '' && value !== undefined) qs[key] = value;
+						}
+
+						responseData = await fetchAllPaginated(
+							`${baseUrl}/api/${apiVersion}/staff/${staffId}/tasks`,
+							qs,
+							returnAll,
+							limit,
+							0,
+						);
+					} else if (operation === 'getTimesheets') {
+						const staffId = this.getNodeParameter('staffId', i) as string;
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+
+						const qs: Record<string, any> = {};
+						for (const [key, value] of Object.entries(filters)) {
+							if (value !== '' && value !== undefined) qs[key] = value;
+						}
+
+						responseData = await fetchAllPaginated(
+							`${baseUrl}/api/${apiVersion}/staff/${staffId}/timesheets`,
+							qs,
+							returnAll,
+							limit,
+							0,
+						);
 					}
 				} else if (resource === 'proposal') {
 					if (operation === 'create') {
@@ -1701,6 +1758,15 @@ export class PerfexCrm implements INodeType {
 							method: 'POST',
 							url: `${baseUrl}/api/${apiVersion}/proposals/${proposalId}/comments`,
 							body: { content },
+							json: true,
+							headers,
+						});
+					} else if (operation === 'getPdf') {
+						const proposalId = this.getNodeParameter('proposalId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/proposals/${proposalId}/pdf`,
 							json: true,
 							headers,
 						});
@@ -1972,6 +2038,48 @@ export class PerfexCrm implements INodeType {
 							json: true,
 							headers,
 						});
+					} else if (operation === 'changePriority') {
+						const taskId = this.getNodeParameter('taskId', i) as string;
+						const priority = this.getNodeParameter('priority', i) as number;
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/tasks/${taskId}/priority`,
+							body: { priority },
+							json: true,
+							headers,
+						});
+					} else if (operation === 'listFollowers') {
+						const taskId = this.getNodeParameter('taskId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/tasks/${taskId}/followers`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'addFollower') {
+						const taskId = this.getNodeParameter('taskId', i) as string;
+						const staffId = this.getNodeParameter('staffId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/tasks/${taskId}/followers`,
+							body: { staff_id: staffId },
+							json: true,
+							headers,
+						});
+					} else if (operation === 'removeFollower') {
+						const taskId = this.getNodeParameter('taskId', i) as string;
+						const staffId = this.getNodeParameter('staffId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'DELETE',
+							url: `${baseUrl}/api/${apiVersion}/tasks/${taskId}/followers/${staffId}`,
+							json: true,
+							headers,
+						});
 					}
 				} else if (resource === 'creditNote') {
 					if (operation === 'create') {
@@ -2128,6 +2236,15 @@ export class PerfexCrm implements INodeType {
 							headers,
 						});
 						responseData = extractResponseData(responseData);
+					} else if (operation === 'getPdf') {
+						const creditNoteId = this.getNodeParameter('creditNoteId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/credit-notes/${creditNoteId}/pdf`,
+							json: true,
+							headers,
+						});
 					}
 				} else if (resource === 'subscription') {
 					if (operation === 'create') {

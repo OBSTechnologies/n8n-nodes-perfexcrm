@@ -54,6 +54,12 @@ export const estimateOperations: INodeProperties[] = [
 				description: 'Update an estimate',
 				action: 'Update an estimate',
 			},
+			{
+				name: 'Get PDF',
+				value: 'getPdf',
+				description: 'Download an estimate as PDF',
+				action: 'Get estimate PDF',
+			},
 		],
 		default: 'create',
 	},
@@ -663,5 +669,23 @@ export const estimateFields: INodeProperties[] = [
 				description: 'Whether to create the invoice as a draft',
 			},
 		],
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                              estimate:getPdf                              */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Estimate ID',
+		name: 'estimateId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['estimate'],
+				operation: ['getPdf'],
+			},
+		},
+		description: 'The ID of the estimate',
 	},
 ];

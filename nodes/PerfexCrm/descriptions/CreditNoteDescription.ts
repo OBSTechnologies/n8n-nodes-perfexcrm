@@ -66,6 +66,12 @@ export const creditNoteOperations: INodeProperties[] = [
 				description: 'Update a credit note',
 				action: 'Update a credit note',
 			},
+			{
+				name: 'Get PDF',
+				value: 'getPdf',
+				description: 'Download a credit note as PDF',
+				action: 'Get credit note PDF',
+			},
 		],
 		default: 'create',
 	},
@@ -706,5 +712,23 @@ export const creditNoteFields: INodeProperties[] = [
 				description: 'Comma-separated tags',
 			},
 		],
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                            creditNote:getPdf                              */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Credit Note ID',
+		name: 'creditNoteId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['creditNote'],
+				operation: ['getPdf'],
+			},
+		},
+		description: 'The ID of the credit note',
 	},
 ];

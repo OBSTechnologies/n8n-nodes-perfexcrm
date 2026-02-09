@@ -120,6 +120,30 @@ export const taskOperations: INodeProperties[] = [
 				description: 'Update a checklist item on a task',
 				action: 'Update checklist item on task',
 			},
+			{
+				name: 'Change Priority',
+				value: 'changePriority',
+				description: 'Change the priority of a task',
+				action: 'Change task priority',
+			},
+			{
+				name: 'List Followers',
+				value: 'listFollowers',
+				description: 'Get all followers of a task',
+				action: 'List task followers',
+			},
+			{
+				name: 'Add Follower',
+				value: 'addFollower',
+				description: 'Add a follower to a task',
+				action: 'Add a task follower',
+			},
+			{
+				name: 'Remove Follower',
+				value: 'removeFollower',
+				description: 'Remove a follower from a task',
+				action: 'Remove a task follower',
+			},
 		],
 		default: 'create',
 	},
@@ -1321,5 +1345,137 @@ export const taskFields: INodeProperties[] = [
 			},
 		},
 		description: 'The ID of the checklist item',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                            task:changePriority                             */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Task ID',
+		name: 'taskId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['task'],
+				operation: ['changePriority'],
+			},
+		},
+		description: 'The ID of the task',
+	},
+	{
+		displayName: 'Priority',
+		name: 'priority',
+		type: 'options',
+		required: true,
+		options: [
+			{
+				name: 'Low',
+				value: 1,
+			},
+			{
+				name: 'Medium',
+				value: 2,
+			},
+			{
+				name: 'High',
+				value: 3,
+			},
+			{
+				name: 'Urgent',
+				value: 4,
+			},
+		],
+		default: 2,
+		displayOptions: {
+			show: {
+				resource: ['task'],
+				operation: ['changePriority'],
+			},
+		},
+		description: 'The new priority for the task',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                            task:listFollowers                              */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Task ID',
+		name: 'taskId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['task'],
+				operation: ['listFollowers'],
+			},
+		},
+		description: 'The ID of the task',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                             task:addFollower                               */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Task ID',
+		name: 'taskId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['task'],
+				operation: ['addFollower'],
+			},
+		},
+		description: 'The ID of the task',
+	},
+	{
+		displayName: 'Staff ID',
+		name: 'staffId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['task'],
+				operation: ['addFollower'],
+			},
+		},
+		description: 'The ID of the staff member to add as a follower',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                           task:removeFollower                              */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Task ID',
+		name: 'taskId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['task'],
+				operation: ['removeFollower'],
+			},
+		},
+		description: 'The ID of the task',
+	},
+	{
+		displayName: 'Staff ID',
+		name: 'staffId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['task'],
+				operation: ['removeFollower'],
+			},
+		},
+		description: 'The ID of the staff member to remove as a follower',
 	},
 ];

@@ -78,6 +78,24 @@ export const staffOperations: INodeProperties[] = [
 				description: 'Update a staff member',
 				action: 'Update a staff member',
 			},
+			{
+				name: 'Change Password',
+				value: 'changePassword',
+				description: 'Change a staff member password',
+				action: 'Change staff password',
+			},
+			{
+				name: 'Get Tasks',
+				value: 'getTasks',
+				description: 'Get tasks assigned to a staff member',
+				action: 'Get staff tasks',
+			},
+			{
+				name: 'Get Timesheets',
+				value: 'getTimesheets',
+				description: 'Get timesheets for a staff member',
+				action: 'Get staff timesheets',
+			},
 		],
 		default: 'create',
 	},
@@ -642,4 +660,265 @@ export const staffFields: INodeProperties[] = [
 	/*                          staff:getDepartmentList                           */
 	/* -------------------------------------------------------------------------- */
 	// No additional fields required
+
+	/* -------------------------------------------------------------------------- */
+	/*                           staff:changePassword                             */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Staff ID',
+		name: 'staffId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['staff'],
+				operation: ['changePassword'],
+			},
+		},
+		description: 'The ID of the staff member',
+	},
+	{
+		displayName: 'New Password',
+		name: 'newPassword',
+		type: 'string',
+		typeOptions: {
+			password: true,
+		},
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['staff'],
+				operation: ['changePassword'],
+			},
+		},
+		description: 'New password for the staff member',
+	},
+	{
+		displayName: 'Confirm Password',
+		name: 'confirmPassword',
+		type: 'string',
+		typeOptions: {
+			password: true,
+		},
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['staff'],
+				operation: ['changePassword'],
+			},
+		},
+		description: 'Confirm the new password',
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                             staff:getTasks                                 */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Staff ID',
+		name: 'staffId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['staff'],
+				operation: ['getTasks'],
+			},
+		},
+		description: 'The ID of the staff member',
+	},
+	{
+		displayName: 'Return All',
+		name: 'returnAll',
+		type: 'boolean',
+		displayOptions: {
+			show: {
+				resource: ['staff'],
+				operation: ['getTasks'],
+			},
+		},
+		default: false,
+		description: 'Whether to return all results or only up to a given limit',
+	},
+	{
+		displayName: 'Limit',
+		name: 'limit',
+		type: 'number',
+		displayOptions: {
+			show: {
+				resource: ['staff'],
+				operation: ['getTasks'],
+				returnAll: [false],
+			},
+		},
+		typeOptions: {
+			minValue: 1,
+		},
+		default: 50,
+		description: 'Max number of results to return',
+	},
+	{
+		displayName: 'Filters',
+		name: 'filters',
+		type: 'collection',
+		placeholder: 'Add Filter',
+		default: {},
+		displayOptions: {
+			show: {
+				resource: ['staff'],
+				operation: ['getTasks'],
+			},
+		},
+		options: [
+			{
+				displayName: 'Status',
+				name: 'status',
+				type: 'options',
+				options: [
+					{
+						name: 'All',
+						value: '',
+					},
+					{
+						name: 'Not Started',
+						value: '1',
+					},
+					{
+						name: 'Awaiting Feedback',
+						value: '2',
+					},
+					{
+						name: 'Testing',
+						value: '3',
+					},
+					{
+						name: 'In Progress',
+						value: '4',
+					},
+					{
+						name: 'Complete',
+						value: '5',
+					},
+				],
+				default: '',
+				description: 'Filter by task status',
+			},
+			{
+				displayName: 'Priority',
+				name: 'priority',
+				type: 'options',
+				options: [
+					{
+						name: 'All',
+						value: '',
+					},
+					{
+						name: 'Low',
+						value: '1',
+					},
+					{
+						name: 'Medium',
+						value: '2',
+					},
+					{
+						name: 'High',
+						value: '3',
+					},
+					{
+						name: 'Urgent',
+						value: '4',
+					},
+				],
+				default: '',
+				description: 'Filter by task priority',
+			},
+		],
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                           staff:getTimesheets                              */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Staff ID',
+		name: 'staffId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['staff'],
+				operation: ['getTimesheets'],
+			},
+		},
+		description: 'The ID of the staff member',
+	},
+	{
+		displayName: 'Return All',
+		name: 'returnAll',
+		type: 'boolean',
+		displayOptions: {
+			show: {
+				resource: ['staff'],
+				operation: ['getTimesheets'],
+			},
+		},
+		default: false,
+		description: 'Whether to return all results or only up to a given limit',
+	},
+	{
+		displayName: 'Limit',
+		name: 'limit',
+		type: 'number',
+		displayOptions: {
+			show: {
+				resource: ['staff'],
+				operation: ['getTimesheets'],
+				returnAll: [false],
+			},
+		},
+		typeOptions: {
+			minValue: 1,
+		},
+		default: 50,
+		description: 'Max number of results to return',
+	},
+	{
+		displayName: 'Filters',
+		name: 'filters',
+		type: 'collection',
+		placeholder: 'Add Filter',
+		default: {},
+		displayOptions: {
+			show: {
+				resource: ['staff'],
+				operation: ['getTimesheets'],
+			},
+		},
+		options: [
+			{
+				displayName: 'Task ID',
+				name: 'task_id',
+				type: 'string',
+				default: '',
+				description: 'Filter by task ID',
+			},
+			{
+				displayName: 'Date From',
+				name: 'date_from',
+				type: 'dateTime',
+				default: '',
+				description: 'Filter timesheets from this date',
+			},
+			{
+				displayName: 'Date To',
+				name: 'date_to',
+				type: 'dateTime',
+				default: '',
+				description: 'Filter timesheets up to this date',
+			},
+		],
+	},
 ];

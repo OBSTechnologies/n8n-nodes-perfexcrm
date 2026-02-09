@@ -72,6 +72,12 @@ export const proposalOperations: INodeProperties[] = [
 				description: 'Update a proposal',
 				action: 'Update a proposal',
 			},
+			{
+				name: 'Get PDF',
+				value: 'getPdf',
+				description: 'Download a proposal as PDF',
+				action: 'Get proposal PDF',
+			},
 		],
 		default: 'create',
 	},
@@ -907,5 +913,23 @@ export const proposalFields: INodeProperties[] = [
 				description: 'Proposal zip/postal code',
 			},
 		],
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                              proposal:getPdf                              */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Proposal ID',
+		name: 'proposalId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['proposal'],
+				operation: ['getPdf'],
+			},
+		},
+		description: 'The ID of the proposal',
 	},
 ];
