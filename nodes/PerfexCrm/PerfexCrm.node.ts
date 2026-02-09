@@ -87,6 +87,11 @@ import {
 	itemOperations,
 } from './descriptions/ItemDescription';
 
+import {
+	utilityFields,
+	utilityOperations,
+} from './descriptions/UtilityDescription';
+
 export class PerfexCrm implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'PerfexCRM',
@@ -170,6 +175,10 @@ export class PerfexCrm implements INodeType {
 						name: 'Subscription',
 						value: 'subscription',
 					},
+					{
+						name: 'Utility',
+						value: 'utility',
+					},
 				],
 				default: 'customer',
 			},
@@ -201,6 +210,8 @@ export class PerfexCrm implements INodeType {
 			...subscriptionFields,
 			...itemOperations,
 			...itemFields,
+			...utilityOperations,
+			...utilityFields,
 		],
 	};
 
@@ -2246,6 +2257,96 @@ export class PerfexCrm implements INodeType {
 						responseData = await makeRequestWithRetry({
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/item-groups`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					}
+				} else if (resource === 'utility') {
+					if (operation === 'getCurrencies') {
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/currencies`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'getTaxes') {
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/taxes`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'getDepartments') {
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/departments`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'getPaymentModes') {
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/payment-modes`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'getCountries') {
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+
+						const qs: Record<string, any> = {};
+						if (filters.search) {
+							qs.search = filters.search;
+						}
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/countries`,
+							qs,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'getTicketStatuses') {
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/ticket-statuses`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'getTicketPriorities') {
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/ticket-priorities`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'getLeadStatuses') {
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/lead-statuses`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'getLeadSources') {
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/lead-sources`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'getContractTypes') {
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/contract-types`,
 							json: true,
 							headers,
 						});

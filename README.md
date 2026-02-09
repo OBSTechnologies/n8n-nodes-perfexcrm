@@ -46,40 +46,25 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 ### PerfexCRM Node
 
-This node allows you to perform CRUD operations on various PerfexCRM resources:
+**15 resources** with **131+ operations** covering the entire PerfexCRM API.
 
-#### Customers
-- Create a new customer
-- Get a customer by ID
-- Get all customers with filters
-- Update a customer
-- Delete a customer
-
-#### Tickets
-- Create a new ticket
-- Get a ticket by ID
-- Get all tickets with filters
-- Update a ticket
-- Delete a ticket
-- Add a reply to a ticket
-
-#### Invoices
-- Create a new invoice
-- Get an invoice by ID
-- Get all invoices with filters
-
-#### Leads
-- Create a new lead
-- Get a lead by ID
-- Convert a lead to customer
-
-#### Projects
-- Create a new project
-- Get a project by ID
-
-#### Contracts
-- Create a new contract
-- Get a contract by ID
+| Resource | Ops | Operations |
+|----------|:---:|------------|
+| 👤 **Customer** | 5 | Create, Get, Get Many, Update, Delete |
+| 🎫 **Ticket** | 14 | Create, Get, Get Many, Update, Delete, Add Reply, Assign, Change Status, Get Notes, Add Note, List Comments, Add Comment, Get Attachments, Get Statuses |
+| 💰 **Invoice** | 9 | Create, Get, Get Many, Update, Delete, Send, Get Payments, Record Payment, Get PDF |
+| 🎯 **Lead** | 6 | Create, Get, Get Many, Update, Delete, Convert |
+| 📁 **Project** | 8 | Create, Get, Get Many, Update, Delete, Get Members, Get Milestones, Get Tasks |
+| 📄 **Contract** | 11 | Create, Get, Get Many, Update, Delete, Sign, Get Attachments, Get Comments, Get Expired, Get Expiring, Renew |
+| ✅ **Task** | 18 | Create, Get, Get Many, Update, Delete, Assign, Change Status, Mark Complete, Get Attachments, List Comments, Add Comment, List Timesheets, Add Timesheet, List Checklist, Add Checklist Item, Get Checklist Item, Update Checklist Item, Delete Checklist Item |
+| 💸 **Expense** | 5 | Create, Get, Get Many, Update, Delete |
+| 📋 **Estimate** | 9 | Create, Get, Get Many, Update, Delete, Send, Convert, Accept, Decline |
+| 👥 **Staff** | 5 | Create, Get, Get Many, Update, Delete |
+| 📝 **Proposal** | 9 | Create, Get, Get Many, Update, Delete, Send, Convert, Accept, Decline |
+| 💳 **Credit Note** | 9 | Create, Get, Get Many, Update, Delete, Add Refund, List Refunds, Apply Credit, List Credits |
+| 🔄 **Subscription** | 5 | Create, Get, Get Many, Update, Delete |
+| 📦 **Item** | 3 | Get, Get Many, Get Groups |
+| 🔧 **Utility** | 10 | Get Currencies, Get Taxes, Get Departments, Get Payment Modes, Get Countries, Get Ticket Statuses, Get Ticket Priorities, Get Lead Statuses, Get Lead Sources, Get Contract Types |
 
 ### PerfexCRM Trigger Node
 
