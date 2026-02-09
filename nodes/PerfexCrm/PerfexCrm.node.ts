@@ -52,6 +52,26 @@ import {
 	taskOperations,
 } from './descriptions/TaskDescription';
 
+import {
+	expenseFields,
+	expenseOperations,
+} from './descriptions/ExpenseDescription';
+
+import {
+	estimateFields,
+	estimateOperations,
+} from './descriptions/EstimateDescription';
+
+import {
+	staffFields,
+	staffOperations,
+} from './descriptions/StaffDescription';
+
+import {
+	proposalFields,
+	proposalOperations,
+} from './descriptions/ProposalDescription';
+
 export class PerfexCrm implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'PerfexCRM',
@@ -104,6 +124,22 @@ export class PerfexCrm implements INodeType {
 						value: 'contract',
 					},
 					{
+						name: 'Estimate',
+						value: 'estimate',
+					},
+					{
+						name: 'Expense',
+						value: 'expense',
+					},
+					{
+						name: 'Proposal',
+						value: 'proposal',
+					},
+					{
+						name: 'Staff',
+						value: 'staff',
+					},
+					{
 						name: 'Task',
 						value: 'task',
 					},
@@ -124,6 +160,14 @@ export class PerfexCrm implements INodeType {
 			...contractFields,
 			...taskOperations,
 			...taskFields,
+			...expenseOperations,
+			...expenseFields,
+			...estimateOperations,
+			...estimateFields,
+			...staffOperations,
+			...staffFields,
+			...proposalOperations,
+			...proposalFields,
 		],
 	};
 
@@ -219,7 +263,7 @@ export class PerfexCrm implements INodeType {
 					return response.data;
 				} else if (response && typeof response === 'object') {
 					// Some endpoints return object with different keys
-					const possibleArrayKeys = ['invoices', 'customers', 'tickets', 'leads', 'projects', 'contracts', 'tasks', 'items', 'results'];
+					const possibleArrayKeys = ['invoices', 'customers', 'tickets', 'leads', 'projects', 'contracts', 'tasks', 'expenses', 'estimates', 'staff', 'proposals', 'items', 'results'];
 					const arrayKey = possibleArrayKeys.find(key => Array.isArray(response[key]));
 					return arrayKey ? response[arrayKey] : [];
 				}
@@ -1094,6 +1138,525 @@ export class PerfexCrm implements INodeType {
 							method: 'POST',
 							url: `${baseUrl}/api/${apiVersion}/contracts/${contractId}/renew`,
 							body,
+							json: true,
+							headers,
+						});
+					}
+				} else if (resource === 'expense') {
+					if (operation === 'create') {
+						const category = this.getNodeParameter('category', i) as string;
+						const amount = this.getNodeParameter('amount', i) as number;
+						const date = this.getNodeParameter('date', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						// Validate and normalize date
+						const normalizedDate = validateAndFormatDate(this.getNode(), date, 'Date', i);
+
+						// Validate non-negative fields
+						validateNonNegativeFields(this.getNode(), additionalFields, ['tax', 'tax2'], i);
+
+						const body: any = {
+							category,
+							amount,
+							date: normalizedDate,
+							...additionalFields,
+						};
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/expenses`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'get') {
+						const expenseId = this.getNodeParameter('expenseId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/expenses/${expenseId}`,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'getAll') {
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+						const offset = returnAll ? 0 : (this.getNodeParameter('offset', i) as number);
+
+						// Build query string from filters
+						const qs: Record<string, any> = {};
+						for (const [key, value] of Object.entries(filters)) {
+							if (value === '' || value === undefined || value === null) continue;
+							qs[key] = value;
+						}
+
+						responseData = await fetchAllPaginated(
+							`${baseUrl}/api/${apiVersion}/expenses`,
+							qs,
+							returnAll,
+							limit,
+							offset,
+						);
+					} else if (operation === 'update') {
+						const expenseId = this.getNodeParameter('expenseId', i) as string;
+						const updateFields = this.getNodeParameter('updateFields', i) as Record<string, unknown>;
+
+						// Validate and normalize date fields if provided
+						validateAndFormatDateFields(this.getNode(), updateFields, ['date'], i);
+
+						// Validate non-negative fields
+						validateNonNegativeFields(this.getNode(), updateFields, ['amount', 'tax', 'tax2'], i);
+
+						const body = updateFields;
+
+						responseData = await makeRequestWithRetry({
+							method: 'PUT',
+							url: `${baseUrl}/api/${apiVersion}/expenses/${expenseId}`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'delete') {
+						const expenseId = this.getNodeParameter('expenseId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'DELETE',
+							url: `${baseUrl}/api/${apiVersion}/expenses/${expenseId}`,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'getCategories') {
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/expenses/categories`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					}
+				} else if (resource === 'estimate') {
+					if (operation === 'create') {
+						const clientId = this.getNodeParameter('clientId', i) as string;
+						const date = this.getNodeParameter('date', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						// Validate and normalize date
+						const normalizedDate = validateAndFormatDate(this.getNode(), date, 'Date', i);
+
+						// Validate optional date and monetary fields
+						validateAndFormatDateFields(this.getNode(), additionalFields, ['expirydate'], i);
+						validateNonNegativeFields(this.getNode(), additionalFields, ['adjustment', 'discount_percent', 'discount_total'], i);
+
+						const body: any = {
+							clientid: clientId,
+							date: normalizedDate,
+							...additionalFields,
+						};
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/estimates`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'get') {
+						const estimateId = this.getNodeParameter('estimateId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/estimates/${estimateId}`,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'getAll') {
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+						const offset = returnAll ? 0 : (this.getNodeParameter('offset', i) as number);
+
+						// Build query string, normalize date filters
+						const qs: Record<string, any> = {};
+						for (const [key, value] of Object.entries(filters)) {
+							if (value === '' || value === undefined || value === null) continue;
+							if (['date_from', 'date_to', 'expiry_from', 'expiry_to'].includes(key) && typeof value === 'string') {
+								qs[key] = validateAndFormatDate(this.getNode(), value, key, i);
+							} else {
+								qs[key] = value;
+							}
+						}
+
+						responseData = await fetchAllPaginated(
+							`${baseUrl}/api/${apiVersion}/estimates`,
+							qs,
+							returnAll,
+							limit,
+							offset,
+						);
+					} else if (operation === 'update') {
+						const estimateId = this.getNodeParameter('estimateId', i) as string;
+						const updateFields = this.getNodeParameter('updateFields', i) as Record<string, unknown>;
+
+						// Validate and normalize date fields if provided
+						validateAndFormatDateFields(this.getNode(), updateFields, ['date', 'expirydate'], i);
+
+						// Validate monetary fields
+						validateNonNegativeFields(this.getNode(), updateFields, ['adjustment', 'discount_percent', 'discount_total'], i);
+
+						const body = updateFields;
+
+						responseData = await makeRequestWithRetry({
+							method: 'PUT',
+							url: `${baseUrl}/api/${apiVersion}/estimates/${estimateId}`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'delete') {
+						const estimateId = this.getNodeParameter('estimateId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'DELETE',
+							url: `${baseUrl}/api/${apiVersion}/estimates/${estimateId}`,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'send') {
+						const estimateId = this.getNodeParameter('estimateId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/estimates/${estimateId}/send`,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'convert') {
+						const estimateId = this.getNodeParameter('estimateId', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						const body: any = {
+							...additionalFields,
+						};
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/estimates/${estimateId}/convert`,
+							body,
+							json: true,
+							headers,
+						});
+					}
+				} else if (resource === 'staff') {
+					if (operation === 'create') {
+						const firstName = this.getNodeParameter('firstName', i) as string;
+						const lastName = this.getNodeParameter('lastName', i) as string;
+						const email = this.getNodeParameter('email', i) as string;
+						const password = this.getNodeParameter('password', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						// Validate email
+						validateEmail(this.getNode(), email, 'Email', i);
+
+						// Validate non-negative fields
+						validateNonNegativeFields(this.getNode(), additionalFields, ['hourly_rate'], i);
+
+						const body: any = {
+							firstname: firstName,
+							lastname: lastName,
+							email,
+							password,
+							...additionalFields,
+						};
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/staff`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'get') {
+						const staffId = this.getNodeParameter('staffId', i) as string;
+						const options = this.getNodeParameter('options', i) as Record<string, boolean>;
+
+						// Build include query parameter from individual booleans
+						const includes: string[] = [];
+						if (options.includeDepartments) includes.push('departments');
+						if (options.includePermissions) includes.push('permissions');
+
+						const qs: any = {};
+						if (includes.length > 0) {
+							qs.include = includes.join(',');
+						}
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/staff/${staffId}`,
+							qs,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'getAll') {
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+						const offset = returnAll ? 0 : (this.getNodeParameter('offset', i) as number);
+
+						// Build query string from filters
+						const qs: Record<string, any> = {};
+						for (const [key, value] of Object.entries(filters)) {
+							if (value === '' || value === undefined || value === null) continue;
+							qs[key] = value;
+						}
+
+						responseData = await fetchAllPaginated(
+							`${baseUrl}/api/${apiVersion}/staff`,
+							qs,
+							returnAll,
+							limit,
+							offset,
+						);
+					} else if (operation === 'update') {
+						const staffId = this.getNodeParameter('staffId', i) as string;
+						const updateFields = this.getNodeParameter('updateFields', i) as Record<string, unknown>;
+
+						// Validate email if provided
+						validateEmailFields(this.getNode(), updateFields, ['email'], i);
+
+						// Validate non-negative fields
+						validateNonNegativeFields(this.getNode(), updateFields, ['hourly_rate'], i);
+
+						const body = updateFields;
+
+						responseData = await makeRequestWithRetry({
+							method: 'PUT',
+							url: `${baseUrl}/api/${apiVersion}/staff/${staffId}`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'delete') {
+						const staffId = this.getNodeParameter('staffId', i) as string;
+						const transferDataTo = this.getNodeParameter('transferDataTo', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'DELETE',
+							url: `${baseUrl}/api/${apiVersion}/staff/${staffId}`,
+							qs: { transfer_data_to: transferDataTo },
+							json: true,
+							headers,
+						});
+					} else if (operation === 'activate') {
+						const staffId = this.getNodeParameter('staffId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/staff/${staffId}/activate`,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'deactivate') {
+						const staffId = this.getNodeParameter('staffId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/staff/${staffId}/deactivate`,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'getPermissions') {
+						const staffId = this.getNodeParameter('staffId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/staff/${staffId}/permissions`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'getDepartments') {
+						const staffId = this.getNodeParameter('staffId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/staff/${staffId}/departments`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'getRoles') {
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/staff/roles`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'getDepartmentList') {
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/staff/departments`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					}
+				} else if (resource === 'proposal') {
+					if (operation === 'create') {
+						const subject = this.getNodeParameter('subject', i) as string;
+						const date = this.getNodeParameter('date', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						// Validate and normalize date
+						const normalizedDate = validateAndFormatDate(this.getNode(), date, 'Date', i);
+
+						// Validate optional date and monetary fields
+						validateAndFormatDateFields(this.getNode(), additionalFields, ['open_till'], i);
+						validateNonNegativeFields(this.getNode(), additionalFields, ['adjustment', 'discount_percent', 'discount_total'], i);
+
+						// Validate email if provided
+						validateEmailFields(this.getNode(), additionalFields, ['email'], i);
+
+						const body: any = {
+							subject,
+							date: normalizedDate,
+							...additionalFields,
+						};
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/proposals`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'get') {
+						const proposalId = this.getNodeParameter('proposalId', i) as string;
+						const options = this.getNodeParameter('options', i) as Record<string, boolean>;
+
+						const qs: any = {};
+						if (options.includeComments) {
+							qs.include = 'comments';
+						}
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/proposals/${proposalId}`,
+							qs,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'getAll') {
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+						const offset = returnAll ? 0 : (this.getNodeParameter('offset', i) as number);
+
+						// Build query string, normalize date filters
+						const qs: Record<string, any> = {};
+						for (const [key, value] of Object.entries(filters)) {
+							if (value === '' || value === undefined || value === null) continue;
+							if (['date_from', 'date_to', 'open_till_from', 'open_till_to'].includes(key) && typeof value === 'string') {
+								qs[key] = validateAndFormatDate(this.getNode(), value, key, i);
+							} else {
+								qs[key] = value;
+							}
+						}
+
+						responseData = await fetchAllPaginated(
+							`${baseUrl}/api/${apiVersion}/proposals`,
+							qs,
+							returnAll,
+							limit,
+							offset,
+						);
+					} else if (operation === 'update') {
+						const proposalId = this.getNodeParameter('proposalId', i) as string;
+						const updateFields = this.getNodeParameter('updateFields', i) as Record<string, unknown>;
+
+						// Validate and normalize date fields if provided
+						validateAndFormatDateFields(this.getNode(), updateFields, ['date', 'open_till'], i);
+
+						// Validate monetary fields
+						validateNonNegativeFields(this.getNode(), updateFields, ['adjustment', 'discount_percent', 'discount_total'], i);
+
+						// Validate email if provided
+						validateEmailFields(this.getNode(), updateFields, ['email'], i);
+
+						const body = updateFields;
+
+						responseData = await makeRequestWithRetry({
+							method: 'PUT',
+							url: `${baseUrl}/api/${apiVersion}/proposals/${proposalId}`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'delete') {
+						const proposalId = this.getNodeParameter('proposalId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'DELETE',
+							url: `${baseUrl}/api/${apiVersion}/proposals/${proposalId}`,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'send') {
+						const proposalId = this.getNodeParameter('proposalId', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, any>;
+
+						const body: any = {};
+						if (additionalFields.cc) {
+							body.cc = additionalFields.cc;
+						}
+						if (additionalFields.attach_pdf !== undefined) {
+							body.attach_pdf = additionalFields.attach_pdf;
+						}
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/proposals/${proposalId}/send`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'accept') {
+						const proposalId = this.getNodeParameter('proposalId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/proposals/${proposalId}/accept`,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'decline') {
+						const proposalId = this.getNodeParameter('proposalId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/proposals/${proposalId}/decline`,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'listComments') {
+						const proposalId = this.getNodeParameter('proposalId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/proposals/${proposalId}/comments`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'addComment') {
+						const proposalId = this.getNodeParameter('proposalId', i) as string;
+						const content = this.getNodeParameter('content', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/proposals/${proposalId}/comments`,
+							body: { content },
 							json: true,
 							headers,
 						});
