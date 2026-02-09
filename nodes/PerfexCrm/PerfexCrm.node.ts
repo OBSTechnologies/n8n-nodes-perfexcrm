@@ -72,6 +72,21 @@ import {
 	proposalOperations,
 } from './descriptions/ProposalDescription';
 
+import {
+	creditNoteFields,
+	creditNoteOperations,
+} from './descriptions/CreditNoteDescription';
+
+import {
+	subscriptionFields,
+	subscriptionOperations,
+} from './descriptions/SubscriptionDescription';
+
+import {
+	itemFields,
+	itemOperations,
+} from './descriptions/ItemDescription';
+
 export class PerfexCrm implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'PerfexCRM',
@@ -143,6 +158,18 @@ export class PerfexCrm implements INodeType {
 						name: 'Task',
 						value: 'task',
 					},
+					{
+						name: 'Credit Note',
+						value: 'creditNote',
+					},
+					{
+						name: 'Item',
+						value: 'item',
+					},
+					{
+						name: 'Subscription',
+						value: 'subscription',
+					},
 				],
 				default: 'customer',
 			},
@@ -168,6 +195,12 @@ export class PerfexCrm implements INodeType {
 			...staffFields,
 			...proposalOperations,
 			...proposalFields,
+			...creditNoteOperations,
+			...creditNoteFields,
+			...subscriptionOperations,
+			...subscriptionFields,
+			...itemOperations,
+			...itemFields,
 		],
 	};
 
@@ -263,7 +296,7 @@ export class PerfexCrm implements INodeType {
 					return response.data;
 				} else if (response && typeof response === 'object') {
 					// Some endpoints return object with different keys
-					const possibleArrayKeys = ['invoices', 'customers', 'tickets', 'leads', 'projects', 'contracts', 'tasks', 'expenses', 'estimates', 'staff', 'proposals', 'items', 'results'];
+					const possibleArrayKeys = ['invoices', 'customers', 'tickets', 'leads', 'projects', 'contracts', 'tasks', 'expenses', 'estimates', 'staff', 'proposals', 'items', 'credit_notes', 'subscriptions', 'results'];
 					const arrayKey = possibleArrayKeys.find(key => Array.isArray(response[key]));
 					return arrayKey ? response[arrayKey] : [];
 				}
@@ -1928,6 +1961,295 @@ export class PerfexCrm implements INodeType {
 							json: true,
 							headers,
 						});
+					}
+				} else if (resource === 'creditNote') {
+					if (operation === 'create') {
+						const clientId = this.getNodeParameter('clientId', i) as string;
+						const date = this.getNodeParameter('date', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						// Validate and normalize date
+						const normalizedDate = validateAndFormatDate(this.getNode(), date, 'Date', i);
+
+						// Validate monetary fields
+						validateNonNegativeFields(this.getNode(), additionalFields, ['discount_percent', 'discount_total'], i);
+
+						const body: any = {
+							clientid: clientId,
+							date: normalizedDate,
+							...additionalFields,
+						};
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/credit-notes`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'get') {
+						const creditNoteId = this.getNodeParameter('creditNoteId', i) as string;
+						const options = this.getNodeParameter('options', i) as Record<string, any>;
+
+						// Build include query parameter from boolean options
+						const includes: string[] = [];
+						if (options.includeCredits) includes.push('credits');
+						if (options.includeRefunds) includes.push('refunds');
+
+						const qs: Record<string, any> = {};
+						if (includes.length > 0) {
+							qs.include = includes.join(',');
+						}
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/credit-notes/${creditNoteId}`,
+							qs,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'getAll') {
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+						const offset = returnAll ? 0 : (this.getNodeParameter('offset', i) as number);
+
+						// Build query string, normalize date filters
+						const qs: Record<string, any> = {};
+						for (const [key, value] of Object.entries(filters)) {
+							if (value === '' || value === undefined || value === null) continue;
+							if (['date_from', 'date_to'].includes(key) && typeof value === 'string') {
+								qs[key] = validateAndFormatDate(this.getNode(), value, key, i);
+							} else {
+								qs[key] = value;
+							}
+						}
+
+						responseData = await fetchAllPaginated(
+							`${baseUrl}/api/${apiVersion}/credit-notes`,
+							qs,
+							returnAll,
+							limit,
+							offset,
+						);
+					} else if (operation === 'update') {
+						const creditNoteId = this.getNodeParameter('creditNoteId', i) as string;
+						const updateFields = this.getNodeParameter('updateFields', i) as Record<string, unknown>;
+
+						// Validate and normalize date fields if provided
+						validateAndFormatDateFields(this.getNode(), updateFields, ['date'], i);
+
+						// Validate monetary fields
+						validateNonNegativeFields(this.getNode(), updateFields, ['discount_percent', 'discount_total'], i);
+
+						const body = updateFields;
+
+						responseData = await makeRequestWithRetry({
+							method: 'PUT',
+							url: `${baseUrl}/api/${apiVersion}/credit-notes/${creditNoteId}`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'delete') {
+						const creditNoteId = this.getNodeParameter('creditNoteId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'DELETE',
+							url: `${baseUrl}/api/${apiVersion}/credit-notes/${creditNoteId}`,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'addRefund') {
+						const creditNoteId = this.getNodeParameter('creditNoteId', i) as string;
+						const amount = this.getNodeParameter('amount', i) as number;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						// Validate refunded_on date if provided
+						validateAndFormatDateFields(this.getNode(), additionalFields, ['refunded_on'], i);
+
+						const body: any = {
+							amount,
+							...additionalFields,
+						};
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/credit-notes/${creditNoteId}/refunds`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'listRefunds') {
+						const creditNoteId = this.getNodeParameter('creditNoteId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/credit-notes/${creditNoteId}/refunds`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'applyCredit') {
+						const creditNoteId = this.getNodeParameter('creditNoteId', i) as string;
+						const invoiceId = this.getNodeParameter('invoiceId', i) as string;
+						const amount = this.getNodeParameter('amount', i) as number;
+
+						const body: any = {
+							invoice_id: invoiceId,
+							amount,
+						};
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/credit-notes/${creditNoteId}/credits`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'listCredits') {
+						const creditNoteId = this.getNodeParameter('creditNoteId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/credit-notes/${creditNoteId}/credits`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					}
+				} else if (resource === 'subscription') {
+					if (operation === 'create') {
+						const name = this.getNodeParameter('name', i) as string;
+						const clientId = this.getNodeParameter('clientId', i) as string;
+						const currency = this.getNodeParameter('currency', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						// Validate optional date fields
+						validateAndFormatDateFields(this.getNode(), additionalFields, ['date', 'ends_at', 'next_billing_cycle'], i);
+
+						const body: any = {
+							name,
+							clientid: clientId,
+							currency,
+							...additionalFields,
+						};
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/subscriptions`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'get') {
+						const subscriptionId = this.getNodeParameter('subscriptionId', i) as string;
+						const options = this.getNodeParameter('options', i) as Record<string, any>;
+
+						// Build include query parameter from boolean options
+						const includes: string[] = [];
+						if (options.includeInvoices) includes.push('invoices');
+						if (options.includeCustomer) includes.push('customer');
+
+						const qs: Record<string, any> = {};
+						if (includes.length > 0) {
+							qs.include = includes.join(',');
+						}
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/subscriptions/${subscriptionId}`,
+							qs,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'getAll') {
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+						const offset = returnAll ? 0 : (this.getNodeParameter('offset', i) as number);
+
+						// Build query string, normalize date filters
+						const qs: Record<string, any> = {};
+						for (const [key, value] of Object.entries(filters)) {
+							if (value === '' || value === undefined || value === null) continue;
+							if (['created_from', 'created_to'].includes(key) && typeof value === 'string') {
+								qs[key] = validateAndFormatDate(this.getNode(), value, key, i);
+							} else {
+								qs[key] = value;
+							}
+						}
+
+						responseData = await fetchAllPaginated(
+							`${baseUrl}/api/${apiVersion}/subscriptions`,
+							qs,
+							returnAll,
+							limit,
+							offset,
+						);
+					} else if (operation === 'update') {
+						const subscriptionId = this.getNodeParameter('subscriptionId', i) as string;
+						const updateFields = this.getNodeParameter('updateFields', i) as Record<string, unknown>;
+
+						// Validate and normalize date fields if provided
+						validateAndFormatDateFields(this.getNode(), updateFields, ['date', 'ends_at', 'next_billing_cycle'], i);
+
+						const body = updateFields;
+
+						responseData = await makeRequestWithRetry({
+							method: 'PUT',
+							url: `${baseUrl}/api/${apiVersion}/subscriptions/${subscriptionId}`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'delete') {
+						const subscriptionId = this.getNodeParameter('subscriptionId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'DELETE',
+							url: `${baseUrl}/api/${apiVersion}/subscriptions/${subscriptionId}`,
+							json: true,
+							headers,
+						});
+					}
+				} else if (resource === 'item') {
+					if (operation === 'get') {
+						const itemId = this.getNodeParameter('itemId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/items/${itemId}`,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'getAll') {
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+						const offset = returnAll ? 0 : (this.getNodeParameter('offset', i) as number);
+
+						const qs: Record<string, any> = {};
+						for (const [key, value] of Object.entries(filters)) {
+							if (value === '' || value === undefined || value === null) continue;
+							qs[key] = value;
+						}
+
+						responseData = await fetchAllPaginated(
+							`${baseUrl}/api/${apiVersion}/items`,
+							qs,
+							returnAll,
+							limit,
+							offset,
+						);
+					} else if (operation === 'getGroups') {
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/item-groups`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
 					}
 				}
 
