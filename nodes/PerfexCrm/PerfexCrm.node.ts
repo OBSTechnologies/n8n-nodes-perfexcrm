@@ -47,6 +47,11 @@ import {
 	contractOperations,
 } from './descriptions/ContractDescription';
 
+import {
+	taskFields,
+	taskOperations,
+} from './descriptions/TaskDescription';
+
 export class PerfexCrm implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'PerfexCRM',
@@ -98,6 +103,10 @@ export class PerfexCrm implements INodeType {
 						name: 'Contract',
 						value: 'contract',
 					},
+					{
+						name: 'Task',
+						value: 'task',
+					},
 				],
 				default: 'customer',
 			},
@@ -113,6 +122,8 @@ export class PerfexCrm implements INodeType {
 			...projectFields,
 			...contractOperations,
 			...contractFields,
+			...taskOperations,
+			...taskFields,
 		],
 	};
 
@@ -208,7 +219,7 @@ export class PerfexCrm implements INodeType {
 					return response.data;
 				} else if (response && typeof response === 'object') {
 					// Some endpoints return object with different keys
-					const possibleArrayKeys = ['invoices', 'customers', 'tickets', 'leads', 'projects', 'contracts', 'items', 'results'];
+					const possibleArrayKeys = ['invoices', 'customers', 'tickets', 'leads', 'projects', 'contracts', 'tasks', 'items', 'results'];
 					const arrayKey = possibleArrayKeys.find(key => Array.isArray(response[key]));
 					return arrayKey ? response[arrayKey] : [];
 				}
@@ -1083,6 +1094,274 @@ export class PerfexCrm implements INodeType {
 							method: 'POST',
 							url: `${baseUrl}/api/${apiVersion}/contracts/${contractId}/renew`,
 							body,
+							json: true,
+							headers,
+						});
+					}
+				} else if (resource === 'task') {
+					if (operation === 'create') {
+						const name = this.getNodeParameter('name', i) as string;
+						const startdate = this.getNodeParameter('startdate', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						// Validate and normalize start date
+						const normalizedStartDate = validateAndFormatDate(this.getNode(), startdate, 'Start Date', i);
+
+						// Validate optional date and numeric fields
+						validateAndFormatDateFields(this.getNode(), additionalFields, ['duedate'], i);
+						validateNonNegativeFields(this.getNode(), additionalFields, ['hourly_rate'], i);
+
+						// Handle assignees: convert comma-separated string to array
+						let assignees: number[] | undefined;
+						if (additionalFields.assignees && typeof additionalFields.assignees === 'string') {
+							assignees = (additionalFields.assignees as string)
+								.split(',')
+								.map((s: string) => parseInt(s.trim(), 10))
+								.filter((n: number) => !isNaN(n));
+							delete additionalFields.assignees;
+						}
+
+						const body: any = {
+							name,
+							startdate: normalizedStartDate,
+							...additionalFields,
+						};
+
+						if (assignees && assignees.length > 0) {
+							body.assignees = assignees;
+						}
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/tasks`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'get') {
+						const taskId = this.getNodeParameter('taskId', i) as string;
+						const options = this.getNodeParameter('options', i) as Record<string, boolean>;
+
+						// Build include query parameter from individual booleans
+						const includes: string[] = [];
+						if (options.includeComments) includes.push('comments');
+						if (options.includeTimesheets) includes.push('timesheets');
+						if (options.includeChecklist) includes.push('checklist');
+						if (options.includeAssignees) includes.push('assignees');
+
+						const qs: any = {};
+						if (includes.length > 0) {
+							qs.include = includes.join(',');
+						}
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/tasks/${taskId}`,
+							qs,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'getAll') {
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+						const offset = returnAll ? 0 : (this.getNodeParameter('offset', i) as number);
+
+						// Build query string, normalize date filters
+						const qs: Record<string, any> = {};
+						for (const [key, value] of Object.entries(filters)) {
+							if (value === '' || value === undefined || value === null) continue;
+							// Normalize date filter values
+							if (['startdate_from', 'startdate_to', 'duedate_from', 'duedate_to'].includes(key) && typeof value === 'string') {
+								qs[key] = validateAndFormatDate(this.getNode(), value, key, i);
+							} else {
+								qs[key] = value;
+							}
+						}
+
+						responseData = await fetchAllPaginated(
+							`${baseUrl}/api/${apiVersion}/tasks`,
+							qs,
+							returnAll,
+							limit,
+							offset,
+						);
+					} else if (operation === 'update') {
+						const taskId = this.getNodeParameter('taskId', i) as string;
+						const updateFields = this.getNodeParameter('updateFields', i) as Record<string, unknown>;
+
+						// Validate and normalize date fields if provided
+						validateAndFormatDateFields(this.getNode(), updateFields, ['startdate', 'duedate'], i);
+
+						// Validate numeric fields
+						validateNonNegativeFields(this.getNode(), updateFields, ['hourly_rate'], i);
+
+						const body = updateFields;
+
+						responseData = await makeRequestWithRetry({
+							method: 'PUT',
+							url: `${baseUrl}/api/${apiVersion}/tasks/${taskId}`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'delete') {
+						const taskId = this.getNodeParameter('taskId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'DELETE',
+							url: `${baseUrl}/api/${apiVersion}/tasks/${taskId}`,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'assign') {
+						const taskId = this.getNodeParameter('taskId', i) as string;
+						const staffId = this.getNodeParameter('staffId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/tasks/${taskId}/assign`,
+							body: { staff_id: staffId },
+							json: true,
+							headers,
+						});
+					} else if (operation === 'changeStatus') {
+						const taskId = this.getNodeParameter('taskId', i) as string;
+						const status = this.getNodeParameter('status', i) as number;
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/tasks/${taskId}/status`,
+							body: { status },
+							json: true,
+							headers,
+						});
+					} else if (operation === 'markComplete') {
+						const taskId = this.getNodeParameter('taskId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/tasks/${taskId}/mark-complete`,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'getAttachments') {
+						const taskId = this.getNodeParameter('taskId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/tasks/${taskId}/attachments`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'listComments') {
+						const taskId = this.getNodeParameter('taskId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/tasks/${taskId}/comments`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'addComment') {
+						const taskId = this.getNodeParameter('taskId', i) as string;
+						const content = this.getNodeParameter('content', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/tasks/${taskId}/comments`,
+							body: { content },
+							json: true,
+							headers,
+						});
+					} else if (operation === 'listTimesheets') {
+						const taskId = this.getNodeParameter('taskId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/tasks/${taskId}/timesheets`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'addTimesheet') {
+						const taskId = this.getNodeParameter('taskId', i) as string;
+						const startTime = this.getNodeParameter('startTime', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						// Validate hourly_rate if provided
+						validateNonNegativeFields(this.getNode(), additionalFields, ['hourly_rate'], i);
+
+						const body: any = {
+							start_time: startTime,
+							...additionalFields,
+						};
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/tasks/${taskId}/timesheets`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'listChecklist') {
+						const taskId = this.getNodeParameter('taskId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/tasks/${taskId}/checklist`,
+							json: true,
+							headers,
+						});
+						responseData = extractResponseData(responseData);
+					} else if (operation === 'addChecklistItem') {
+						const taskId = this.getNodeParameter('taskId', i) as string;
+						const description = this.getNodeParameter('description', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						const body: any = {
+							description,
+							...additionalFields,
+						};
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/tasks/${taskId}/checklist`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'getChecklistItem') {
+						const taskId = this.getNodeParameter('taskId', i) as string;
+						const checklistItemId = this.getNodeParameter('checklistItemId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/tasks/${taskId}/checklist/${checklistItemId}`,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'updateChecklistItem') {
+						const taskId = this.getNodeParameter('taskId', i) as string;
+						const checklistItemId = this.getNodeParameter('checklistItemId', i) as string;
+						const updateFields = this.getNodeParameter('updateFields', i);
+
+						responseData = await makeRequestWithRetry({
+							method: 'PUT',
+							url: `${baseUrl}/api/${apiVersion}/tasks/${taskId}/checklist/${checklistItemId}`,
+							body: updateFields,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'deleteChecklistItem') {
+						const taskId = this.getNodeParameter('taskId', i) as string;
+						const checklistItemId = this.getNodeParameter('checklistItemId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'DELETE',
+							url: `${baseUrl}/api/${apiVersion}/tasks/${taskId}/checklist/${checklistItemId}`,
 							json: true,
 							headers,
 						});
