@@ -29,3 +29,10 @@ coverage/
 .env
 .env.local
 .env.*.local
+
+# Claude Code
+.claude/
+
+# Test data
+test-workflows/
+nul

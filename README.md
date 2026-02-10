@@ -46,7 +46,7 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 ### PerfexCRM Node
 
-**15 resources** with **131+ operations** covering the entire PerfexCRM API.
+**19 resources** with **155+ operations** covering the entire PerfexCRM API.
 
 | Resource | Ops | Operations |
 |----------|:---:|------------|
@@ -63,19 +63,23 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 | 📝 **Proposal** | 9 | Create, Get, Get Many, Update, Delete, Send, Convert, Accept, Decline |
 | 💳 **Credit Note** | 9 | Create, Get, Get Many, Update, Delete, Add Refund, List Refunds, Apply Credit, List Credits |
 | 🔄 **Subscription** | 5 | Create, Get, Get Many, Update, Delete |
-| 📦 **Item** | 3 | Get, Get Many, Get Groups |
+| 📦 **Item** | 6 | Create, Get, Get Many, Update, Delete, Get Groups |
+| 💵 **Payment** | 5 | Create, Get, Get Many, Update, Delete |
+| 📇 **Contact** | 5 | Create, Get, Get Many, Update, Delete |
+| ⏱️ **Timesheet** | 5 | Create, Get, Get Many, Update, Delete |
+| 📝 **Note** | 5 | Create, Get, Get Many, Update, Delete |
 | 🔧 **Utility** | 10 | Get Currencies, Get Taxes, Get Departments, Get Payment Modes, Get Countries, Get Ticket Statuses, Get Ticket Priorities, Get Lead Statuses, Get Lead Sources, Get Contract Types |
 
 ### PerfexCRM Trigger Node
 
 This trigger node listens for webhooks from PerfexCRM and starts workflows when events occur:
 
-#### Supported Events
+#### Supported Events (97+ webhook events)
 - Customer events (created, updated, deleted)
 - Contact events (created, updated, deleted)
 - Lead events (created, updated, converted, deleted)
 - Invoice events (created, updated, paid, overdue, deleted)
-- Payment events (recorded, failed)
+- Payment events (created, updated, deleted, recorded, failed)
 - Proposal events (created, sent, accepted, declined)
 - Estimate events (created, sent, accepted, declined, converted)
 - Contract events (created, signed, expiring, expired)
@@ -84,6 +88,9 @@ This trigger node listens for webhooks from PerfexCRM and starts workflows when 
 - Ticket events (created, updated, status changed, reply added, assigned, closed)
 - Staff events (created, login)
 - Expense events (created, updated)
+- Item events (created, updated, deleted)
+- Timesheet events (created, updated, deleted)
+- Note events (created, updated, deleted)
 
 ## Credentials
 
