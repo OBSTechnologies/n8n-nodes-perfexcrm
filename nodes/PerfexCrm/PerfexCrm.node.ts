@@ -88,6 +88,26 @@ import {
 } from './descriptions/ItemDescription';
 
 import {
+	paymentFields,
+	paymentOperations,
+} from './descriptions/PaymentDescription';
+
+import {
+	contactFields,
+	contactOperations,
+} from './descriptions/ContactDescription';
+
+import {
+	timesheetFields,
+	timesheetOperations,
+} from './descriptions/TimesheetDescription';
+
+import {
+	noteFields,
+	noteOperations,
+} from './descriptions/NoteDescription';
+
+import {
 	utilityFields,
 	utilityOperations,
 } from './descriptions/UtilityDescription';
@@ -172,6 +192,22 @@ export class PerfexCrm implements INodeType {
 						value: 'item',
 					},
 					{
+						name: 'Payment',
+						value: 'payment',
+					},
+					{
+						name: 'Contact',
+						value: 'contact',
+					},
+					{
+						name: 'Timesheet',
+						value: 'timesheet',
+					},
+					{
+						name: 'Note',
+						value: 'note',
+					},
+					{
 						name: 'Subscription',
 						value: 'subscription',
 					},
@@ -210,6 +246,14 @@ export class PerfexCrm implements INodeType {
 			...subscriptionFields,
 			...itemOperations,
 			...itemFields,
+			...paymentOperations,
+			...paymentFields,
+			...contactOperations,
+			...contactFields,
+			...timesheetOperations,
+			...timesheetFields,
+			...noteOperations,
+			...noteFields,
 			...utilityOperations,
 			...utilityFields,
 		],
@@ -307,7 +351,7 @@ export class PerfexCrm implements INodeType {
 					return response.data;
 				} else if (response && typeof response === 'object') {
 					// Some endpoints return object with different keys
-					const possibleArrayKeys = ['invoices', 'customers', 'tickets', 'leads', 'projects', 'contracts', 'tasks', 'expenses', 'estimates', 'staff', 'proposals', 'items', 'credit_notes', 'subscriptions', 'results'];
+					const possibleArrayKeys = ['invoices', 'customers', 'tickets', 'leads', 'projects', 'contracts', 'tasks', 'expenses', 'estimates', 'staff', 'proposals', 'items', 'credit_notes', 'subscriptions', 'payments', 'contacts', 'timesheets', 'notes', 'results'];
 					const arrayKey = possibleArrayKeys.find(key => Array.isArray(response[key]));
 					return arrayKey ? response[arrayKey] : [];
 				}
@@ -2342,7 +2386,27 @@ export class PerfexCrm implements INodeType {
 						});
 					}
 				} else if (resource === 'item') {
-					if (operation === 'get') {
+					if (operation === 'create') {
+						const description = this.getNodeParameter('description', i) as string;
+						const rate = this.getNodeParameter('rate', i) as number;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						validateNonNegativeFields(this.getNode(), additionalFields, ['tax', 'tax2'], i);
+
+						const body: any = {
+							description,
+							rate,
+							...additionalFields,
+						};
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/items`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'get') {
 						const itemId = this.getNodeParameter('itemId', i) as string;
 
 						responseData = await makeRequestWithRetry({
@@ -2370,6 +2434,30 @@ export class PerfexCrm implements INodeType {
 							limit,
 							offset,
 						);
+					} else if (operation === 'update') {
+						const itemId = this.getNodeParameter('itemId', i) as string;
+						const updateFields = this.getNodeParameter('updateFields', i) as Record<string, unknown>;
+
+						validateNonNegativeFields(this.getNode(), updateFields, ['rate', 'tax', 'tax2'], i);
+
+						const body = updateFields;
+
+						responseData = await makeRequestWithRetry({
+							method: 'PUT',
+							url: `${baseUrl}/api/${apiVersion}/items/${itemId}`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'delete') {
+						const itemId = this.getNodeParameter('itemId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'DELETE',
+							url: `${baseUrl}/api/${apiVersion}/items/${itemId}`,
+							json: true,
+							headers,
+						});
 					} else if (operation === 'getGroups') {
 						responseData = await makeRequestWithRetry({
 							method: 'GET',
@@ -2378,6 +2466,312 @@ export class PerfexCrm implements INodeType {
 							headers,
 						});
 						responseData = extractResponseData(responseData);
+					}
+				} else if (resource === 'payment') {
+					if (operation === 'create') {
+						const invoiceid = this.getNodeParameter('invoiceid', i) as number;
+						const amount = this.getNodeParameter('amount', i) as number;
+						const date = this.getNodeParameter('date', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						const normalizedDate = validateAndFormatDate(this.getNode(), date, 'Date', i);
+						validateNonNegativeNumber(this.getNode(), amount, 'Amount', i);
+
+						const body: any = {
+							invoiceid,
+							amount,
+							date: normalizedDate,
+							...additionalFields,
+						};
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/payments`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'get') {
+						const paymentId = this.getNodeParameter('paymentId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/payments/${paymentId}`,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'getAll') {
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+						const offset = returnAll ? 0 : (this.getNodeParameter('offset', i) as number);
+
+						const qs: Record<string, any> = {};
+						for (const [key, value] of Object.entries(filters)) {
+							if (value === '' || value === undefined || value === null) continue;
+							qs[key] = value;
+						}
+
+						responseData = await fetchAllPaginated(
+							`${baseUrl}/api/${apiVersion}/payments`,
+							qs,
+							returnAll,
+							limit,
+							offset,
+						);
+					} else if (operation === 'update') {
+						const paymentId = this.getNodeParameter('paymentId', i) as string;
+						const updateFields = this.getNodeParameter('updateFields', i) as Record<string, unknown>;
+
+						validateAndFormatDateFields(this.getNode(), updateFields, ['date'], i);
+						validateNonNegativeFields(this.getNode(), updateFields, ['amount'], i);
+
+						const body = updateFields;
+
+						responseData = await makeRequestWithRetry({
+							method: 'PUT',
+							url: `${baseUrl}/api/${apiVersion}/payments/${paymentId}`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'delete') {
+						const paymentId = this.getNodeParameter('paymentId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'DELETE',
+							url: `${baseUrl}/api/${apiVersion}/payments/${paymentId}`,
+							json: true,
+							headers,
+						});
+					}
+				} else if (resource === 'contact') {
+					if (operation === 'create') {
+						const userid = this.getNodeParameter('userid', i) as number;
+						const firstname = this.getNodeParameter('firstname', i) as string;
+						const lastname = this.getNodeParameter('lastname', i) as string;
+						const email = this.getNodeParameter('email', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						validateEmail(this.getNode(), email, 'Email', i);
+
+						const body: any = {
+							userid,
+							firstname,
+							lastname,
+							email,
+							...additionalFields,
+						};
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/contacts`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'get') {
+						const contactId = this.getNodeParameter('contactId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/contacts/${contactId}`,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'getAll') {
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+						const offset = returnAll ? 0 : (this.getNodeParameter('offset', i) as number);
+
+						const qs: Record<string, any> = {};
+						for (const [key, value] of Object.entries(filters)) {
+							if (value === '' || value === undefined || value === null) continue;
+							qs[key] = value;
+						}
+
+						responseData = await fetchAllPaginated(
+							`${baseUrl}/api/${apiVersion}/contacts`,
+							qs,
+							returnAll,
+							limit,
+							offset,
+						);
+					} else if (operation === 'update') {
+						const contactId = this.getNodeParameter('contactId', i) as string;
+						const updateFields = this.getNodeParameter('updateFields', i) as Record<string, unknown>;
+
+						validateEmailFields(this.getNode(), updateFields, ['email'], i);
+
+						const body = updateFields;
+
+						responseData = await makeRequestWithRetry({
+							method: 'PUT',
+							url: `${baseUrl}/api/${apiVersion}/contacts/${contactId}`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'delete') {
+						const contactId = this.getNodeParameter('contactId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'DELETE',
+							url: `${baseUrl}/api/${apiVersion}/contacts/${contactId}`,
+							json: true,
+							headers,
+						});
+					}
+				} else if (resource === 'timesheet') {
+					if (operation === 'create') {
+						const task_id = this.getNodeParameter('task_id', i) as number;
+						const staff_id = this.getNodeParameter('staff_id', i) as number;
+						const start_time = this.getNodeParameter('start_time', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						validateNumericId(this.getNode(), String(task_id), 'Task ID', i);
+						validateNumericId(this.getNode(), String(staff_id), 'Staff ID', i);
+						validateNonNegativeFields(this.getNode(), additionalFields, ['hourly_rate'], i);
+
+						const body: any = {
+							task_id,
+							staff_id,
+							start_time,
+							...additionalFields,
+						};
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/timesheets`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'get') {
+						const timesheetId = this.getNodeParameter('timesheetId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/timesheets/${timesheetId}`,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'getAll') {
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+						const offset = returnAll ? 0 : (this.getNodeParameter('offset', i) as number);
+
+						const qs: Record<string, any> = {};
+						for (const [key, value] of Object.entries(filters)) {
+							if (value === '' || value === undefined || value === null) continue;
+							qs[key] = value;
+						}
+
+						responseData = await fetchAllPaginated(
+							`${baseUrl}/api/${apiVersion}/timesheets`,
+							qs,
+							returnAll,
+							limit,
+							offset,
+						);
+					} else if (operation === 'update') {
+						const timesheetId = this.getNodeParameter('timesheetId', i) as string;
+						const updateFields = this.getNodeParameter('updateFields', i) as Record<string, unknown>;
+
+						validateNonNegativeFields(this.getNode(), updateFields, ['hourly_rate'], i);
+
+						const body = updateFields;
+
+						responseData = await makeRequestWithRetry({
+							method: 'PUT',
+							url: `${baseUrl}/api/${apiVersion}/timesheets/${timesheetId}`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'delete') {
+						const timesheetId = this.getNodeParameter('timesheetId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'DELETE',
+							url: `${baseUrl}/api/${apiVersion}/timesheets/${timesheetId}`,
+							json: true,
+							headers,
+						});
+					}
+				} else if (resource === 'note') {
+					if (operation === 'create') {
+						const rel_type = this.getNodeParameter('rel_type', i) as string;
+						const rel_id = this.getNodeParameter('rel_id', i) as number;
+						const description = this.getNodeParameter('description', i) as string;
+
+						validateNumericId(this.getNode(), String(rel_id), 'Related ID', i);
+
+						const body: any = {
+							rel_type,
+							rel_id,
+							description,
+						};
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/notes`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'get') {
+						const noteId = this.getNodeParameter('noteId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/notes/${noteId}`,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'getAll') {
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+						const offset = returnAll ? 0 : (this.getNodeParameter('offset', i) as number);
+
+						const qs: Record<string, any> = {};
+						for (const [key, value] of Object.entries(filters)) {
+							if (value === '' || value === undefined || value === null) continue;
+							qs[key] = value;
+						}
+
+						responseData = await fetchAllPaginated(
+							`${baseUrl}/api/${apiVersion}/notes`,
+							qs,
+							returnAll,
+							limit,
+							offset,
+						);
+					} else if (operation === 'update') {
+						const noteId = this.getNodeParameter('noteId', i) as string;
+						const updateFields = this.getNodeParameter('updateFields', i) as Record<string, unknown>;
+
+						const body = updateFields;
+
+						responseData = await makeRequestWithRetry({
+							method: 'PUT',
+							url: `${baseUrl}/api/${apiVersion}/notes/${noteId}`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'delete') {
+						const noteId = this.getNodeParameter('noteId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'DELETE',
+							url: `${baseUrl}/api/${apiVersion}/notes/${noteId}`,
+							json: true,
+							headers,
+						});
 					}
 				} else if (resource === 'utility') {
 					if (operation === 'getCurrencies') {

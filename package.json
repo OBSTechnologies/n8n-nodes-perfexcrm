@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-perfexcrm",
-  "version": "0.1.26",
+  "version": "0.1.27",
   "description": "n8n nodes for PerfexCRM API and Webhooks integration",
   "keywords": [
     "n8n-community-node-package",

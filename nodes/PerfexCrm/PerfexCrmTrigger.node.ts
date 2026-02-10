@@ -125,6 +125,21 @@ export class PerfexCrmTrigger implements INodeType {
 					},
 					// Payment Events
 					{
+						name: 'Payment Created',
+						value: 'payment.created',
+						description: 'Triggered when a new payment is created',
+					},
+					{
+						name: 'Payment Updated',
+						value: 'payment.updated',
+						description: 'Triggered when a payment is updated',
+					},
+					{
+						name: 'Payment Deleted',
+						value: 'payment.deleted',
+						description: 'Triggered when a payment is deleted',
+					},
+					{
 						name: 'Payment Recorded',
 						value: 'payment.recorded',
 						description: 'Triggered when a payment is recorded',
@@ -291,6 +306,54 @@ export class PerfexCrmTrigger implements INodeType {
 						name: 'Expense Updated',
 						value: 'expense.updated',
 						description: 'Triggered when an expense is updated',
+					},
+					// Item Events
+					{
+						name: 'Item Created',
+						value: 'item.created',
+						description: 'Triggered when a new catalog item is created',
+					},
+					{
+						name: 'Item Updated',
+						value: 'item.updated',
+						description: 'Triggered when a catalog item is updated',
+					},
+					{
+						name: 'Item Deleted',
+						value: 'item.deleted',
+						description: 'Triggered when a catalog item is deleted',
+					},
+					// Timesheet Events
+					{
+						name: 'Timesheet Created',
+						value: 'timesheet.created',
+						description: 'Triggered when a new timesheet entry is created',
+					},
+					{
+						name: 'Timesheet Updated',
+						value: 'timesheet.updated',
+						description: 'Triggered when a timesheet entry is updated',
+					},
+					{
+						name: 'Timesheet Deleted',
+						value: 'timesheet.deleted',
+						description: 'Triggered when a timesheet entry is deleted',
+					},
+					// Note Events
+					{
+						name: 'Note Created',
+						value: 'note.created',
+						description: 'Triggered when a new note is created',
+					},
+					{
+						name: 'Note Updated',
+						value: 'note.updated',
+						description: 'Triggered when a note is updated',
+					},
+					{
+						name: 'Note Deleted',
+						value: 'note.deleted',
+						description: 'Triggered when a note is deleted',
 					},
 				],
 			},
