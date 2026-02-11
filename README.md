@@ -11,11 +11,11 @@ PerfexCRM is a powerful customer relationship management system. This node allow
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
-## 🛒 Prerequisites - PerfexCRM API & Webhooks Module
+## Prerequisites - PerfexCRM API & Webhooks Module
 
 **This n8n node requires the PerfexCRM API & Webhooks module to be installed on your PerfexCRM instance.**
 
-### 👉 [Purchase the PerfexCRM API & Webhooks Module at perfexapi.com](https://perfexapi.com)
+### [Purchase the PerfexCRM API & Webhooks Module at perfexapi.com](https://perfexapi.com)
 
 The module provides:
 - RESTful API endpoints for all PerfexCRM entities
@@ -46,51 +46,56 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 ### PerfexCRM Node
 
-**19 resources** with **155+ operations** covering the entire PerfexCRM API.
+**19 resources** with **176 operations** covering the entire PerfexCRM API.
 
 | Resource | Ops | Operations |
 |----------|:---:|------------|
-| 👤 **Customer** | 5 | Create, Get, Get Many, Update, Delete |
-| 🎫 **Ticket** | 14 | Create, Get, Get Many, Update, Delete, Add Reply, Assign, Change Status, Get Notes, Add Note, List Comments, Add Comment, Get Attachments, Get Statuses |
-| 💰 **Invoice** | 9 | Create, Get, Get Many, Update, Delete, Send, Get Payments, Record Payment, Get PDF |
-| 🎯 **Lead** | 6 | Create, Get, Get Many, Update, Delete, Convert |
-| 📁 **Project** | 8 | Create, Get, Get Many, Update, Delete, Get Members, Get Milestones, Get Tasks |
-| 📄 **Contract** | 11 | Create, Get, Get Many, Update, Delete, Sign, Get Attachments, Get Comments, Get Expired, Get Expiring, Renew |
-| ✅ **Task** | 18 | Create, Get, Get Many, Update, Delete, Assign, Change Status, Mark Complete, Get Attachments, List Comments, Add Comment, List Timesheets, Add Timesheet, List Checklist, Add Checklist Item, Get Checklist Item, Update Checklist Item, Delete Checklist Item |
-| 💸 **Expense** | 5 | Create, Get, Get Many, Update, Delete |
-| 📋 **Estimate** | 9 | Create, Get, Get Many, Update, Delete, Send, Convert, Accept, Decline |
-| 👥 **Staff** | 5 | Create, Get, Get Many, Update, Delete |
-| 📝 **Proposal** | 9 | Create, Get, Get Many, Update, Delete, Send, Convert, Accept, Decline |
-| 💳 **Credit Note** | 9 | Create, Get, Get Many, Update, Delete, Add Refund, List Refunds, Apply Credit, List Credits |
-| 🔄 **Subscription** | 5 | Create, Get, Get Many, Update, Delete |
-| 📦 **Item** | 6 | Create, Get, Get Many, Update, Delete, Get Groups |
-| 💵 **Payment** | 5 | Create, Get, Get Many, Update, Delete |
-| 📇 **Contact** | 5 | Create, Get, Get Many, Update, Delete |
-| ⏱️ **Timesheet** | 5 | Create, Get, Get Many, Update, Delete |
-| 📝 **Note** | 5 | Create, Get, Get Many, Update, Delete |
-| 🔧 **Utility** | 10 | Get Currencies, Get Taxes, Get Departments, Get Payment Modes, Get Countries, Get Ticket Statuses, Get Ticket Priorities, Get Lead Statuses, Get Lead Sources, Get Contract Types |
+| **Customer** | 10 | Create, Get, Get Many, Update, Delete, Get Contacts, Get Contracts, Get Invoices, Get Projects, Get Tickets |
+| **Ticket** | 14 | Create, Get, Get Many, Update, Delete, Add Reply, Get Reply, Update Reply, Delete Reply, List Replies, Get Attachments, Get History, Assign, Change Status |
+| **Invoice** | 7 | Create, Get, Get Many, Update, Delete, Get Payments, Send |
+| **Lead** | 8 | Create, Get, Get Many, Update, Delete, Convert, Get Activities, Get Notes |
+| **Project** | 9 | Create, Get, Get Many, Update, Delete, Get Activity, Get Files, Get Milestones, Get Tasks |
+| **Contract** | 11 | Create, Get, Get Many, Update, Delete, Sign, Get Attachments, Get Comments, Get Expired, Get Expiring, Renew |
+| **Task** | 22 | Create, Get, Get Many, Update, Delete, Assign, Change Status, Mark Complete, Get Attachments, List Comments, Add Comment, List Timesheets, Add Timesheet, List Checklist, Add Checklist Item, Get Checklist Item, Update Checklist Item, Delete Checklist Item, Change Priority, List Followers, Add Follower, Remove Follower |
+| **Expense** | 6 | Create, Get, Get Many, Update, Delete, Get Categories |
+| **Estimate** | 8 | Create, Get, Get Many, Update, Delete, Send, Convert, Get PDF |
+| **Staff** | 14 | Create, Get, Get Many, Update, Delete, Activate, Deactivate, Get Permissions, Get Departments, Get Roles, Get Department List, Change Password, Get Tasks, Get Timesheets |
+| **Proposal** | 11 | Create, Get, Get Many, Update, Delete, Send, Accept, Decline, List Comments, Add Comment, Get PDF |
+| **Credit Note** | 10 | Create, Get, Get Many, Update, Delete, Add Refund, List Refunds, Apply Credit, List Credits, Get PDF |
+| **Subscription** | 5 | Create, Get, Get Many, Update, Delete |
+| **Item** | 6 | Create, Get, Get Many, Update, Delete, Get Groups |
+| **Payment** | 5 | Create, Get, Get Many, Update, Delete |
+| **Contact** | 5 | Create, Get, Get Many, Update, Delete |
+| **Timesheet** | 5 | Create, Get, Get Many, Update, Delete |
+| **Note** | 5 | Create, Get, Get Many, Update, Delete |
+| **Utility** | 10 | Get Currencies, Get Taxes, Get Departments, Get Payment Modes, Get Countries, Get Ticket Statuses, Get Ticket Priorities, Get Lead Statuses, Get Lead Sources, Get Contract Types |
 
 ### PerfexCRM Trigger Node
 
-This trigger node listens for webhooks from PerfexCRM and starts workflows when events occur:
+This trigger node listens for webhooks from PerfexCRM and starts workflows when events occur.
 
-#### Supported Events (97+ webhook events)
-- Customer events (created, updated, deleted)
-- Contact events (created, updated, deleted)
-- Lead events (created, updated, converted, deleted)
-- Invoice events (created, updated, paid, overdue, deleted)
-- Payment events (created, updated, deleted, recorded, failed)
-- Proposal events (created, sent, accepted, declined)
-- Estimate events (created, sent, accepted, declined, converted)
-- Contract events (created, signed, expiring, expired)
-- Project events (created, updated, completed)
-- Task events (created, updated, completed, comment added)
-- Ticket events (created, updated, status changed, reply added, assigned, closed)
-- Staff events (created, login)
-- Expense events (created, updated)
-- Item events (created, updated, deleted)
-- Timesheet events (created, updated, deleted)
-- Note events (created, updated, deleted)
+#### Supported Events (80 webhook events)
+
+| Category | Events |
+|----------|--------|
+| **Contact** | created, deleted, updated |
+| **Contract** | cancelled, created, deleted, expired, expiring, signed, updated |
+| **Credit Note** | created, credits_applied, deleted, refund_created, sent, status_changed, updated |
+| **Customer** | contact_added, created, deleted, status_changed, updated |
+| **Estimate** | accepted, converted, created, declined, deleted, expiring, sent, updated |
+| **Expense** | created, deleted, updated |
+| **Invoice** | cancelled, created, deleted, overdue, paid, sent, status_changed, updated |
+| **Item** | created, deleted, updated |
+| **Lead** | assigned, converted, created, status_changed, updated |
+| **Note** | created, deleted, updated |
+| **Payment** | created, deleted, updated |
+| **Project** | completed, created, status_changed, updated |
+| **Proposal** | accepted, comment_added, converted, created, declined, deleted, sent, updated |
+| **Staff** | activated, created, deactivated, deleted, login, password_changed, permissions_changed, updated |
+| **Subscription** | created |
+| **Task** | assigned, comment_added, completed, created, deleted, overdue, priority_changed, status_changed, timesheet_added, updated |
+| **Ticket** | assigned, attachment_added, closed, created, deleted, priority_changed, reopened, reply_added, status_changed, updated |
+| **Timesheet** | created, deleted, updated |
 
 ## Credentials
 
@@ -103,48 +108,48 @@ You'll need to enter the following credentials to use this node:
 ### Getting your API Key
 
 1. Log in to your PerfexCRM admin panel
-2. Navigate to **Setup** → **API & Webhooks**
+2. Navigate to **Setup** > **API & Webhooks**
 3. Click on **API Keys**
 4. Create a new API key with the appropriate permissions
 5. Copy the API key (you'll only see it once!)
 
 ## Example Workflows
 
-### 🎯 Lead to Customer Automation
+### Lead to Customer Automation
 Automatically convert leads to customers when they meet certain criteria, create a project, and send a welcome email.
 
-### 💰 Invoice Payment Tracking
+### Invoice Payment Tracking
 Track invoice payments in real-time, update your accounting system, and notify your team.
 
-### 🎫 Support Ticket Routing
+### Support Ticket Routing
 Automatically assign tickets based on department, priority, or customer type, and send notifications to the right team members.
 
-### 📊 Customer Onboarding
+### Customer Onboarding
 Create a complete onboarding workflow: create customer, setup project, generate first invoice, and send welcome materials.
 
 ## Compatibility
 
-- ✅ n8n version 0.180.0 or later
-- ✅ PerfexCRM 2.3.x or later
-- ✅ PerfexCRM API & Webhooks Module (required)
+- n8n version 0.180.0 or later
+- PerfexCRM 2.3.x or later
+- PerfexCRM API & Webhooks Module (required)
 
 ## Resources
 
-* 🛒 [Purchase PerfexCRM API & Webhooks Module](https://perfexapi.com)
-* 📚 [n8n Community Nodes Documentation](https://docs.n8n.io/integrations/community-nodes/)
-* 📖 [PerfexCRM API Documentation](https://your-perfex.com/admin/api_webhooks/documentation)
-* 🔧 [GitHub Repository](https://github.com/OBSTechnologies/n8n-nodes-perfexcrm)
-* 📦 [npm Package](https://www.npmjs.com/package/n8n-nodes-perfexcrm)
+* [Purchase PerfexCRM API & Webhooks Module](https://perfexapi.com)
+* [n8n Community Nodes Documentation](https://docs.n8n.io/integrations/community-nodes/)
+* [PerfexCRM API Documentation](https://your-perfex.com/admin/api_webhooks/documentation)
+* [GitHub Repository](https://github.com/OBSTechnologies/n8n-nodes-perfexcrm)
+* [npm Package](https://www.npmjs.com/package/n8n-nodes-perfexcrm)
 
 ## Support
 
 ### For n8n Node Issues:
-- 🐛 [Open an issue on GitHub](https://github.com/OBSTechnologies/n8n-nodes-perfexcrm/issues)
-- 💬 [n8n Community Forum](https://community.n8n.io/)
+- [Open an issue on GitHub](https://github.com/OBSTechnologies/n8n-nodes-perfexcrm/issues)
+- [n8n Community Forum](https://community.n8n.io/)
 
 ### For PerfexCRM API & Webhooks Module:
-- 🛒 [Support at perfexapi.com](https://perfexapi.com)
-- 📧 Email: support@obstechnologies.com
+- [Support at perfexapi.com](https://perfexapi.com)
+- Email: support@obstechnologies.com
 
 ## Contributing
 
@@ -165,10 +170,10 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-[MIT](https://github.com/OBSTechnologies/n8n-nodes-perfexcrm/blob/main/LICENSE) © OBS Technologies
+[MIT](https://github.com/OBSTechnologies/n8n-nodes-perfexcrm/blob/main/LICENSE) (c) OBS Technologies
 
 ---
 
-**Made with ❤️ by [OBS Technologies](https://obstechnologies.com)**
+**Made with care by [OBS Technologies](https://obstechnologies.com)**
 
-⭐ If you find this node useful, please star it on [GitHub](https://github.com/OBSTechnologies/n8n-nodes-perfexcrm)!
+If you find this node useful, please star it on [GitHub](https://github.com/OBSTechnologies/n8n-nodes-perfexcrm)!
