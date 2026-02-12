@@ -717,7 +717,7 @@ export class PerfexCrm implements INodeType {
 						const staffId = this.getNodeParameter('staffId', i) as string;
 
 						responseData = await makeRequestWithRetry({
-							method: 'PUT',
+							method: 'POST',
 							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}/assign`,
 							body: { staff_id: staffId },
 							json: true,
@@ -728,7 +728,7 @@ export class PerfexCrm implements INodeType {
 						const status = this.getNodeParameter('status', i) as number;
 
 						responseData = await makeRequestWithRetry({
-							method: 'PUT',
+							method: 'POST',
 							url: `${baseUrl}/api/${apiVersion}/tickets/${ticketId}/status`,
 							body: { status },
 							json: true,
