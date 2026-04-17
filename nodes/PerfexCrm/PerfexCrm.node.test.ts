@@ -87,12 +87,12 @@ describe('Node Description Structure', () => {
 		expect(resourceParam.noDataExpression).toBe(true);
 	});
 
-	it('should have 15 resource options', () => {
+	it('should have 19 resource options', () => {
 		const options = resourceParam.options as Array<{ value: string }>;
-		expect(options).toHaveLength(15);
+		expect(options).toHaveLength(19);
 	});
 
-	it('should include all 15 resources', () => {
+	it('should include all 19 resources', () => {
 		const resourceValues = (resourceParam.options as Array<{ value: string }>).map(
 			(o) => o.value,
 		);
@@ -110,6 +110,10 @@ describe('Node Description Structure', () => {
 			'task',
 			'creditNote',
 			'item',
+			'payment',
+			'contact',
+			'timesheet',
+			'note',
 			'subscription',
 			'utility',
 		];
@@ -166,7 +170,7 @@ describe('Operation Definitions', () => {
 		expect(ops).toContain('getTickets');
 	});
 
-	it('should define task operations with 18 values', () => {
+	it('should define task operations with 22 values', () => {
 		const ops = getOperationValues('task');
 		const expectedOps = [
 			'create',
@@ -176,6 +180,7 @@ describe('Operation Definitions', () => {
 			'delete',
 			'assign',
 			'changeStatus',
+			'changePriority',
 			'markComplete',
 			'addComment',
 			'listComments',
@@ -187,6 +192,9 @@ describe('Operation Definitions', () => {
 			'deleteChecklistItem',
 			'listChecklist',
 			'getAttachments',
+			'listFollowers',
+			'addFollower',
+			'removeFollower',
 		];
 		expect(ops).toHaveLength(expectedOps.length);
 		for (const op of expectedOps) {
@@ -194,7 +202,7 @@ describe('Operation Definitions', () => {
 		}
 	});
 
-	it('should define credit note operations: CRUD plus refunds and credits', () => {
+	it('should define credit note operations: CRUD plus refunds, credits, and PDF', () => {
 		const ops = getOperationValues('creditNote');
 		const expectedOps = [
 			'create',
@@ -206,6 +214,7 @@ describe('Operation Definitions', () => {
 			'listRefunds',
 			'applyCredit',
 			'listCredits',
+			'getPdf',
 		];
 		expect(ops).toHaveLength(expectedOps.length);
 		for (const op of expectedOps) {
@@ -213,16 +222,13 @@ describe('Operation Definitions', () => {
 		}
 	});
 
-	it('should define item operations as read-only: get, getAll, getGroups', () => {
+	it('should define item operations with full CRUD plus getGroups', () => {
 		const ops = getOperationValues('item');
-		expect(ops).toHaveLength(3);
-		expect(ops).toContain('get');
-		expect(ops).toContain('getAll');
-		expect(ops).toContain('getGroups');
-		// Should NOT have create, update, or delete
-		expect(ops).not.toContain('create');
-		expect(ops).not.toContain('update');
-		expect(ops).not.toContain('delete');
+		const expectedOps = ['create', 'get', 'getAll', 'update', 'delete', 'getGroups'];
+		expect(ops).toHaveLength(expectedOps.length);
+		for (const op of expectedOps) {
+			expect(ops).toContain(op);
+		}
 	});
 
 	it('should define subscription operations: create, get, getAll, update, delete', () => {

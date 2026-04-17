@@ -18,5 +18,5 @@ module.exports = {
 		'n8n-nodes-base/node-param-multi-options-type-unsorted-items': 'off',
 		'@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
 	},
-	ignorePatterns: ['.eslintrc.js', 'dist/**/*', 'node_modules/**/*'],
+	ignorePatterns: ['.eslintrc.js', 'dist/**/*', 'node_modules/**/*', '**/*.test.ts'],
 };
