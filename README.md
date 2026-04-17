@@ -1,17 +1,38 @@
-# n8n-nodes-perfexcrm
+# PerfexCRM for n8n — Community Node for API & Webhook Workflow Automation
 
-[![npm version](https://badge.fury.io/js/n8n-nodes-perfexcrm.svg)](https://www.npmjs.com/package/n8n-nodes-perfexcrm)
-[![GitHub release](https://img.shields.io/github/release/OBSTechnologies/n8n-nodes-perfexcrm.svg)](https://github.com/OBSTechnologies/n8n-nodes-perfexcrm/releases)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![n8n Community Nodes](https://img.shields.io/badge/n8n-Community%20Nodes-orange)](https://n8n.io/)
+[![npm version](https://badge.fury.io/js/n8n-nodes-perfexcrm.svg "n8n-nodes-perfexcrm on npm")](https://www.npmjs.com/package/n8n-nodes-perfexcrm)
+[![GitHub release](https://img.shields.io/github/release/OBSTechnologies/n8n-nodes-perfexcrm.svg "GitHub release version")](https://github.com/OBSTechnologies/n8n-nodes-perfexcrm/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg "MIT License")](https://opensource.org/licenses/MIT)
+[![n8n Community Nodes](https://img.shields.io/badge/n8n-Community%20Nodes-orange "n8n community nodes")](https://n8n.io/)
 
-This is an n8n community node. It lets you use PerfexCRM in your n8n workflows.
-
-PerfexCRM is a powerful customer relationship management system. This node allows you to interact with the PerfexCRM API and receive webhooks for real-time events.
+Connect [PerfexCRM](https://www.perfexcrm.com/) to [n8n](https://n8n.io/) with this community node and build no-code / low-code workflow automations across your entire CRM. It ships with **19 PerfexCRM resources**, **176 REST API operations**, and a trigger node with **80 real-time webhook events** — enough coverage to automate leads, tickets, invoices, projects, contracts, subscriptions, and more without writing glue code. Whether you want to sync PerfexCRM data to Slack, Google Sheets, HubSpot, or Mailchimp, push webhook-driven events into any of n8n's 400+ integrations, or orchestrate multi-step CRM workflows, this node is a complete PerfexCRM automation toolkit.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
-## Prerequisites - PerfexCRM API & Webhooks Module
+## Table of Contents
+
+- [Why use this node?](#why-use-this-node)
+- [Prerequisites — PerfexCRM API & Webhooks Module](#prerequisites--perfexcrm-api--webhooks-module)
+- [Installation](#installation)
+- [PerfexCRM API Operations (19 Resources, 176 Operations)](#perfexcrm-api-operations-19-resources-176-operations)
+- [PerfexCRM Trigger Node — 80 Real-Time Webhook Events](#perfexcrm-trigger-node--80-real-time-webhook-events)
+- [Authentication & API Credentials](#authentication--api-credentials)
+- [Example PerfexCRM Automation Workflows](#example-perfexcrm-automation-workflows)
+- [Compatibility & Requirements](#compatibility--requirements)
+- [FAQ](#faq)
+- [Resources](#resources)
+- [Support](#support)
+- [Contributing](#contributing)
+
+## Why use this node?
+
+- **Sync PerfexCRM leads and customers** to any tool — Slack, Google Sheets, HubSpot, Mailchimp, Airtable, Notion, or any of n8n's 400+ integrations.
+- **Automate invoice and payment notifications** the moment a PerfexCRM invoice is paid, overdue, or cancelled.
+- **Route support tickets intelligently** based on department, priority, or customer tier, and page the right team in real time.
+- **Trigger workflows from 80+ PerfexCRM webhook events** — from `lead.created` and `invoice.paid` to `contract.expiring` and `task.overdue`.
+- **Eliminate manual PerfexCRM admin work** with no-code / low-code automation — no glue scripts, no cron jobs, no duct-taped Zaps.
+
+## Prerequisites — PerfexCRM API & Webhooks Module
 
 **This n8n node requires the PerfexCRM API & Webhooks module to be installed on your PerfexCRM instance.**
 
@@ -42,9 +63,9 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
    ```
 6. Restart n8n
 
-## Operations
+## PerfexCRM API Operations (19 Resources, 176 Operations)
 
-### PerfexCRM Node
+### PerfexCRM Action Node — REST API Coverage
 
 **19 resources** with **176 operations** covering the entire PerfexCRM API.
 
@@ -70,9 +91,9 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 | **Note** | 5 | Create, Get, Get Many, Update, Delete |
 | **Utility** | 10 | Get Currencies, Get Taxes, Get Departments, Get Payment Modes, Get Countries, Get Ticket Statuses, Get Ticket Priorities, Get Lead Statuses, Get Lead Sources, Get Contract Types |
 
-### PerfexCRM Trigger Node
+### PerfexCRM Trigger Node — 80 Real-Time Webhook Events
 
-This trigger node listens for webhooks from PerfexCRM and starts workflows when events occur.
+Listen for webhooks from PerfexCRM and start n8n workflows the instant something happens in your CRM — no polling required.
 
 #### Supported Events (80 webhook events)
 
@@ -97,7 +118,7 @@ This trigger node listens for webhooks from PerfexCRM and starts workflows when 
 | **Ticket** | assigned, attachment_added, closed, created, deleted, priority_changed, reopened, reply_added, status_changed, updated |
 | **Timesheet** | created, deleted, updated |
 
-## Credentials
+## Authentication & API Credentials
 
 You'll need to enter the following credentials to use this node:
 
@@ -105,7 +126,7 @@ You'll need to enter the following credentials to use this node:
 2. **API Key**: Your PerfexCRM API key (starts with `pk_`)
 3. **API Version**: The API version to use (currently only `v1` is supported)
 
-### Getting your API Key
+### Getting your PerfexCRM API Key
 
 1. Log in to your PerfexCRM admin panel
 2. Navigate to **Setup** > **API & Webhooks**
@@ -113,25 +134,51 @@ You'll need to enter the following credentials to use this node:
 4. Create a new API key with the appropriate permissions
 5. Copy the API key (you'll only see it once!)
 
-## Example Workflows
+## Example PerfexCRM Automation Workflows
 
 ### Lead to Customer Automation
-Automatically convert leads to customers when they meet certain criteria, create a project, and send a welcome email.
+When a new lead is created in PerfexCRM, automatically score it, convert qualifying leads to customers, spin up a dedicated project, draft a welcome invoice, and fire a personalised onboarding email via Gmail or SendGrid. Eliminates the manual hand-off between sales and delivery.
 
 ### Invoice Payment Tracking
-Track invoice payments in real-time, update your accounting system, and notify your team.
+Subscribe to the `invoice.paid` and `invoice.overdue` webhook events, push paid invoices to your accounting system (QuickBooks, Xero, or a Google Sheet), and alert your finance team in Slack or Microsoft Teams the moment an invoice goes overdue. Cash flow visibility without a single manual check.
 
 ### Support Ticket Routing
-Automatically assign tickets based on department, priority, or customer type, and send notifications to the right team members.
+Automatically triage every new PerfexCRM ticket: route VIP customers to senior staff, page on-call engineers for P1 priorities, assign by department keyword, and post a digest of open tickets to a Slack channel each morning. A support inbox that sorts itself.
 
 ### Customer Onboarding
-Create a complete onboarding workflow: create customer, setup project, generate first invoice, and send welcome materials.
+Build an end-to-end onboarding workflow: create the PerfexCRM customer record, create a matching project and initial milestones, generate and send the first invoice, provision accounts in third-party tools (Stripe, HubSpot, Intercom), and deliver a branded welcome package — all triggered by one webhook.
 
-## Compatibility
+## Compatibility & Requirements
 
 - n8n version 0.180.0 or later
 - PerfexCRM 2.3.x or later
 - PerfexCRM API & Webhooks Module (required)
+
+## FAQ
+
+### Is this an official n8n node?
+No. `n8n-nodes-perfexcrm` is a community node built and maintained by [OBS Technologies](https://obstechnologies.com). It is installable on any self-hosted n8n instance via the Community Nodes feature.
+
+### Do I need the PerfexCRM API & Webhooks module?
+Yes. This node talks to the PerfexCRM REST API exposed by the [PerfexCRM API & Webhooks module](https://perfexapi.com). Without it installed on your PerfexCRM instance, neither the action node nor the trigger node can reach your data.
+
+### Which PerfexCRM versions are supported?
+PerfexCRM 2.3.x and later. Older PerfexCRM versions may work for read-only operations but are not officially tested.
+
+### Can I use this node on n8n Cloud?
+Not yet. Community nodes only run on self-hosted n8n by default. We're working towards [verified community node](https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes/) status, which would unlock n8n Cloud availability.
+
+### How do I get a PerfexCRM API key?
+In your PerfexCRM admin panel, go to **Setup → API & Webhooks → API Keys**, create a new key with the permissions you need, and copy the value (shown once). See [Authentication & API Credentials](#authentication--api-credentials) for details.
+
+### What PerfexCRM events can trigger an n8n workflow?
+80 webhook events across 18 categories — leads, customers, invoices, tickets, tasks, contracts, projects, proposals, estimates, payments, subscriptions, and more. See the [full event table](#supported-events-80-webhook-events).
+
+### Does this node support PerfexCRM custom fields?
+Yes. Custom fields are passed through on create and update operations, and are returned in the payload on read operations and webhook events.
+
+### Is there a rate limit?
+Rate limiting is handled by the PerfexCRM API & Webhooks module itself. n8n will surface the HTTP 429 responses if you exceed your configured rate limit so you can implement retries.
 
 ## Resources
 
@@ -174,6 +221,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ---
 
-**Made with care by [OBS Technologies](https://obstechnologies.com)**
+**Built for the n8n community by [OBS Technologies](https://obstechnologies.com)** — specialists in PerfexCRM automation, custom CRM integrations, and workflow engineering.
 
 If you find this node useful, please star it on [GitHub](https://github.com/OBSTechnologies/n8n-nodes-perfexcrm)!
