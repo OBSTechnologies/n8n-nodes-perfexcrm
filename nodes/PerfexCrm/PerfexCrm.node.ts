@@ -5,6 +5,7 @@ import {
 	INodeTypeDescription,
 	NodeApiError,
 	NodeOperationError,
+	sleep,
 } from 'n8n-workflow';
 
 import {
@@ -270,12 +271,8 @@ export class PerfexCrm implements INodeType {
 		const baseUrl = credentials.baseUrl as string;
 		const apiVersion = credentials.apiVersion as string;
 		const apiKey = credentials.apiKey as string;
-		// Configurable page size - PerfexCRM default is 25, max is 100
-		// Can be overridden via PERFEXCRM_PAGE_SIZE env var
-		const pageSize = Math.min(
-			parseInt(process.env.PERFEXCRM_PAGE_SIZE || '25', 10),
-			100 // PerfexCRM max limit
-		);
+		// PerfexCRM default page size (25, max 100)
+		const pageSize = 25;
 
 		// Headers with API key for authentication
 		const headers = {
@@ -304,7 +301,7 @@ export class PerfexCrm implements INodeType {
 			let lastError: any;
 			for (let attempt = 0; attempt < maxRetries; attempt++) {
 				try {
-					return await this.helpers.request(options);
+					return await this.helpers.httpRequest(options);
 				} catch (error: any) {
 					lastError = error;
 					// Check for rate limit (429 Too Many Requests)
@@ -318,8 +315,8 @@ export class PerfexCrm implements INodeType {
 
 						// Only retry if not the last attempt
 						if (attempt < maxRetries - 1) {
-							console.warn(`Rate limited. Retrying after ${retryAfter} seconds (attempt ${attempt + 1}/${maxRetries})`);
-							await new Promise(resolve => setTimeout(resolve, delayMs));
+							this.logger.warn(`Rate limited. Retrying after ${retryAfter} seconds (attempt ${attempt + 1}/${maxRetries})`);
+							await sleep(delayMs);
 							continue;
 						}
 					}

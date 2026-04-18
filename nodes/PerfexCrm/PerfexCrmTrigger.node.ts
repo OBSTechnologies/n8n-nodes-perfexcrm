@@ -579,21 +579,18 @@ export class PerfexCrmTrigger implements INodeType {
 
 				const baseUrl = credentials.baseUrl as string;
 				const apiVersion = credentials.apiVersion as string;
-				const apiKey = credentials.apiKey as string;
-
-				const headers = {
-					'X-API-KEY': apiKey,
-				};
 
 				// Check if webhook exists
 				if (webhookData.webhookId) {
 					try {
-						const response = await this.helpers.request({
-							method: 'GET',
-							url: `${baseUrl}/api/${apiVersion}/webhooks/${webhookData.webhookId}`,
-							json: true,
-							headers,
-						});
+						const response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'perfexCrmApi',
+							{
+								method: 'GET',
+								url: `${baseUrl}/api/${apiVersion}/webhooks/${webhookData.webhookId}`,
+							},
+						);
 
 						if (response && response.data) {
 							return true;
@@ -615,11 +612,6 @@ export class PerfexCrmTrigger implements INodeType {
 
 				const baseUrl = credentials.baseUrl as string;
 				const apiVersion = credentials.apiVersion as string;
-				const apiKey = credentials.apiKey as string;
-
-				const headers = {
-					'X-API-KEY': apiKey,
-				};
 
 				const body = {
 					name: `n8n-webhook-${this.getWorkflow().id}`,
@@ -629,13 +621,15 @@ export class PerfexCrmTrigger implements INodeType {
 					is_active: 1,
 				};
 
-				const response = await this.helpers.request({
-					method: 'POST',
-					url: `${baseUrl}/api/${apiVersion}/webhooks`,
-					body,
-					json: true,
-					headers,
-				});
+				const response = await this.helpers.httpRequestWithAuthentication.call(
+					this,
+					'perfexCrmApi',
+					{
+						method: 'POST',
+						url: `${baseUrl}/api/${apiVersion}/webhooks`,
+						body,
+					},
+				);
 
 				if (response.data && response.data.id) {
 					webhookData.webhookId = response.data.id;
@@ -652,19 +646,16 @@ export class PerfexCrmTrigger implements INodeType {
 				if (webhookData.webhookId) {
 					const baseUrl = credentials.baseUrl as string;
 					const apiVersion = credentials.apiVersion as string;
-					const apiKey = credentials.apiKey as string;
-
-					const headers = {
-						'X-API-KEY': apiKey,
-					};
 
 					try {
-						await this.helpers.request({
-							method: 'DELETE',
-							url: `${baseUrl}/api/${apiVersion}/webhooks/${webhookData.webhookId}`,
-							json: true,
-							headers,
-						});
+						await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'perfexCrmApi',
+							{
+								method: 'DELETE',
+								url: `${baseUrl}/api/${apiVersion}/webhooks/${webhookData.webhookId}`,
+							},
+						);
 					} catch (error) {
 						return false;
 					}
@@ -689,7 +680,7 @@ export class PerfexCrmTrigger implements INodeType {
 			const signature = headers['x-webhook-signature'] as string | undefined;
 
 			if (!signature) {
-				console.warn('Webhook signature verification failed: X-Webhook-Signature header not found');
+				this.logger.warn('Webhook signature verification failed: X-Webhook-Signature header not found');
 				return {
 					workflowData: [],
 				};
@@ -718,7 +709,7 @@ export class PerfexCrmTrigger implements INodeType {
 			}
 
 			if (!isValid) {
-				console.warn('Webhook signature verification failed: Invalid signature');
+				this.logger.warn('Webhook signature verification failed: Invalid signature');
 				return {
 					workflowData: [],
 				};
