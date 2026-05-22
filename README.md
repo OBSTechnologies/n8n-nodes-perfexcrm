@@ -175,7 +175,7 @@ In your PerfexCRM admin panel, go to **Setup → API & Webhooks → API Keys**, 
 80 webhook events across 18 categories — leads, customers, invoices, tickets, tasks, contracts, projects, proposals, estimates, payments, subscriptions, and more. See the [full event table](#supported-events-80-webhook-events).
 
 ### Does this node support PerfexCRM custom fields?
-Yes. Custom fields are passed through on create and update operations, and are returned in the payload on read operations and webhook events.
+Yes. Create and Update operations include a **Custom Fields** section (under Additional/Update Fields) where you add custom field values — keyed by the field's numeric ID or its slug. Custom field values are also returned in the payload on Get operations and webhook events. Supported across Customers, Contacts, Leads, Projects, Tasks, Tickets, Contracts, Expenses, Invoices, Estimates, Proposals, Credit Notes and Staff (requires the PerfexCRM API & Webhooks module v2.8.9+).
 
 ### Is there a rate limit?
 Rate limiting is handled by the PerfexCRM API & Webhooks module itself. n8n will surface the HTTP 429 responses if you exceed your configured rate limit so you can implement retries.

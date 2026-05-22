@@ -18,6 +18,8 @@ import {
 	validateNonNegativeFields,
 } from './helpers/validation';
 
+import { applyCustomFields } from './helpers/customFields';
+
 import {
 	customerFields,
 	customerOperations,
@@ -298,6 +300,9 @@ export class PerfexCrm implements INodeType {
 			options: any,
 			maxRetries: number = 3
 		): Promise<any> => {
+			// Convert the UI custom-field collection (body.customFields) into the
+			// API's flat custom_fields map. No-op for requests without custom fields.
+			applyCustomFields(options?.body);
 			let lastError: any;
 			for (let attempt = 0; attempt < maxRetries; attempt++) {
 				try {

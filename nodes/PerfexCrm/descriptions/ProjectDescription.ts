@@ -222,6 +222,39 @@ export const projectFields: INodeProperties[] = [
 				default: 0,
 				description: 'Project progress percentage (0-100)',
 			},
+			{
+				displayName: 'Custom Fields',
+				name: 'customFields',
+				type: 'fixedCollection',
+				placeholder: 'Add Custom Field',
+				default: {},
+				typeOptions: {
+					multipleValues: true,
+				},
+				description: 'Set PerfexCRM custom field values. Use each custom field\'s numeric ID or its slug as the key.',
+				options: [
+					{
+						name: 'field',
+						displayName: 'Field',
+						values: [
+							{
+								displayName: 'Field ID or Slug',
+								name: 'key',
+								type: 'string',
+								default: '',
+								description: 'Custom field numeric ID (e.g. 21) or slug',
+							},
+							{
+								displayName: 'Value',
+								name: 'value',
+								type: 'string',
+								default: '',
+								description: 'Value to store for this custom field',
+							},
+						],
+					},
+				],
+			},
 		],
 	},
 
@@ -516,6 +549,39 @@ export const projectFields: INodeProperties[] = [
 				},
 				default: 0,
 				description: 'Project progress percentage (0-100)',
+			},
+			{
+				displayName: 'Custom Fields',
+				name: 'customFields',
+				type: 'fixedCollection',
+				placeholder: 'Add Custom Field',
+				default: {},
+				typeOptions: {
+					multipleValues: true,
+				},
+				description: 'Set PerfexCRM custom field values. Use each custom field\'s numeric ID or its slug as the key.',
+				options: [
+					{
+						name: 'field',
+						displayName: 'Field',
+						values: [
+							{
+								displayName: 'Field ID or Slug',
+								name: 'key',
+								type: 'string',
+								default: '',
+								description: 'Custom field numeric ID (e.g. 21) or slug',
+							},
+							{
+								displayName: 'Value',
+								name: 'value',
+								type: 'string',
+								default: '',
+								description: 'Value to store for this custom field',
+							},
+						],
+					},
+				],
 			},
 		],
 	},
