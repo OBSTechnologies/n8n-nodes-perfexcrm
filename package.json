@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-perfexcrm",
-  "version": "0.1.32",
+  "version": "0.1.33",
   "description": "n8n community node for PerfexCRM — 19 resources, 176 API operations, and 80 webhook triggers for CRM workflow automation",
   "keywords": [
     "n8n-community-node-package",
@@ -55,6 +55,9 @@
   "files": [
     "dist/**/*"
   ],
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  },
   "n8n": {
     "n8nNodesApiVersion": 1,
     "credentials": [
