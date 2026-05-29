@@ -5,6 +5,7 @@ import {
 	INodeType,
 	INodeTypeDescription,
 	IWebhookResponseData,
+	NodeApiError,
 } from 'n8n-workflow';
 
 export class PerfexCrmTrigger implements INodeType {
@@ -595,8 +596,20 @@ export class PerfexCrmTrigger implements INodeType {
 						if (response && response.data) {
 							return true;
 						}
-					} catch (error) {
-						// Webhook doesn't exist
+					} catch (error: any) {
+						const statusCode = error.statusCode || error.response?.statusCode;
+
+						if (statusCode === 404) {
+							return false;
+						}
+
+						throw new NodeApiError(this.getNode(), error, {
+							message: 'Failed to check PerfexCRM webhook registration',
+							description: statusCode
+								? `HTTP ${statusCode} while checking existing webhook ${webhookData.webhookId}`
+								: `Could not check existing webhook ${webhookData.webhookId}`,
+							httpCode: statusCode ? String(statusCode) : undefined,
+						});
 					}
 				}
 
