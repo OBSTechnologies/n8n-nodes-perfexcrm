@@ -5,6 +5,7 @@ import {
 	INodeType,
 	INodeTypeDescription,
 	IWebhookResponseData,
+	NodeOperationError,
 } from 'n8n-workflow';
 
 export class PerfexCrmTrigger implements INodeType {
@@ -646,7 +647,17 @@ export class PerfexCrmTrigger implements INodeType {
 					return true;
 				}
 
-				return false;
+				// A 2xx with no webhook id is an unexpected response (e.g. the api_webhooks
+				// module doesn't expose the webhooks REST endpoint). Surface it instead of
+				// silently returning false, which would leave the trigger inactive with no
+				// explanation. (Real HTTP failures already throw a NodeApiError above.)
+				throw new NodeOperationError(
+					this.getNode(),
+					'PerfexCRM did not return a webhook id when registering the trigger.',
+					{
+						description: `Unexpected response from POST ${baseUrl}/api/${apiVersion}/webhooks. Verify the api_webhooks module exposes the webhooks REST endpoint and the API key has webhook permissions.`,
+					},
+				);
 			},
 
 			async delete(this: IHookFunctions): Promise<boolean> {
