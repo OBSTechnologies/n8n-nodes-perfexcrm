@@ -595,8 +595,18 @@ export class PerfexCrmTrigger implements INodeType {
 						if (response && response.data) {
 							return true;
 						}
-					} catch (error) {
-						// Webhook doesn't exist
+					} catch (error: any) {
+						// Only a genuine 404 means the webhook no longer exists in PerfexCRM.
+						// Any other failure (network error, 401/403 auth, 5xx) must NOT be
+						// swallowed: treating it as "not found" would make n8n register a
+						// DUPLICATE webhook on the next activation. httpRequestWithAuthentication
+						// throws a NodeApiError whose `httpCode` is the status code as a string.
+						if (error.httpCode === '404' || error.statusCode === 404) {
+							// Stale id — clear it so create() can re-register cleanly.
+							delete webhookData.webhookId;
+							return false;
+						}
+						throw error;
 					}
 				}
 
@@ -656,8 +666,15 @@ export class PerfexCrmTrigger implements INodeType {
 								url: `${baseUrl}/api/${apiVersion}/webhooks/${webhookData.webhookId}`,
 							},
 						);
-					} catch (error) {
-						return false;
+					} catch (error: any) {
+						// A 404 means the webhook is already gone server-side — that's the
+						// desired end state, so fall through and clear the local id.
+						// For any other error (auth/network/5xx) keep the id and report
+						// failure so n8n can surface it rather than silently orphaning the
+						// webhook in PerfexCRM.
+						if (error.httpCode !== '404' && error.statusCode !== 404) {
+							return false;
+						}
 					}
 
 					delete webhookData.webhookId;
