@@ -5,8 +5,8 @@ Maintainer / AI-assistant notes for this repo. (User-facing docs live in `README
 ## What this is
 A **verified n8n community node** (`n8n-nodes-perfexcrm`) that connects PerfexCRM to n8n.
 It is the client for the **PerfexCRM API & Webhooks** module sold at https://perfexapi.com.
-- Main node: `nodes/PerfexCrm/PerfexCrm.node.ts` (REST CRUD — 19 resources, 176 operations)
-- Trigger node: `nodes/PerfexCrm/PerfexCrmTrigger.node.ts` (80 webhook events)
+- Main node: `nodes/PerfexCrm/PerfexCrm.node.ts` (REST CRUD — 19 resources, 171 operations)
+- Trigger node: `nodes/PerfexCrm/PerfexCrmTrigger.node.ts` (99 webhook events)
 - Credentials: `credentials/PerfexCrmApi.credentials.ts` (Header Auth: `X-API-KEY`, not JWT)
 
 ## ✅ n8n VERIFICATION — invariants that MUST stay true
