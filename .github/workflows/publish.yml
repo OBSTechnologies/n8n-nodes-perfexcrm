@@ -30,4 +30,10 @@ jobs:
         run: npm run build
 
       - name: Publish to npm
-        run: npm publish --provenance --access public
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if [ -n "$(npm view "n8n-nodes-perfexcrm@$VERSION" version 2>/dev/null)" ]; then
+            echo "n8n-nodes-perfexcrm@$VERSION is already published — skipping publish."
+            exit 0
+          fi
+          npm publish --provenance --access public

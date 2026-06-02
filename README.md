@@ -3,9 +3,9 @@
 [![npm version](https://badge.fury.io/js/n8n-nodes-perfexcrm.svg "n8n-nodes-perfexcrm on npm")](https://www.npmjs.com/package/n8n-nodes-perfexcrm)
 [![GitHub release](https://img.shields.io/github/release/OBSTechnologies/n8n-nodes-perfexcrm.svg "GitHub release version")](https://github.com/OBSTechnologies/n8n-nodes-perfexcrm/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg "MIT License")](https://opensource.org/licenses/MIT)
-[![n8n Community Nodes](https://img.shields.io/badge/n8n-Community%20Nodes-orange "n8n community nodes")](https://n8n.io/)
+[![Verified n8n Community Node](https://img.shields.io/badge/n8n-Verified%20Community%20Node-EA4B71 "Verified n8n community node — installable in one click on n8n Cloud")](https://docs.n8n.io/integrations/community-nodes/installation/verified-install/)
 
-Connect [PerfexCRM](https://www.perfexcrm.com/) to [n8n](https://n8n.io/) with this community node and build no-code / low-code workflow automations across your entire CRM. It ships with **19 PerfexCRM resources**, **176 REST API operations**, and a trigger node with **80 real-time webhook events** — enough coverage to automate leads, tickets, invoices, projects, contracts, subscriptions, and more without writing glue code. Whether you want to sync PerfexCRM data to Slack, Google Sheets, HubSpot, or Mailchimp, push webhook-driven events into any of n8n's 400+ integrations, or orchestrate multi-step CRM workflows, this node is a complete PerfexCRM automation toolkit.
+Connect [PerfexCRM](https://www.perfexcrm.com/) to [n8n](https://n8n.io/) with this **verified n8n community node** — installable in one click directly from the n8n canvas, on n8n Cloud or self-hosted — and build no-code / low-code workflow automations across your entire CRM. It ships with **19 PerfexCRM resources**, **176 REST API operations**, and a trigger node with **80 real-time webhook events** — enough coverage to automate leads, tickets, invoices, projects, contracts, subscriptions, and more without writing glue code. Whether you want to sync PerfexCRM data to Slack, Google Sheets, HubSpot, or Mailchimp, push webhook-driven events into any of n8n's 400+ integrations, or orchestrate multi-step CRM workflows, this node is a complete PerfexCRM automation toolkit.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
@@ -157,7 +157,7 @@ Build an end-to-end onboarding workflow: create the PerfexCRM customer record, c
 ## FAQ
 
 ### Is this an official n8n node?
-No. `n8n-nodes-perfexcrm` is a community node built and maintained by [OBS Technologies](https://obstechnologies.com). It is installable on any self-hosted n8n instance via the Community Nodes feature.
+No — it's a community node built and maintained by [OBS Technologies](https://obstechnologies.com), now **verified by n8n**. As a verified community node it installs in one click on **n8n Cloud** and any self-hosted n8n (v1.94+) via the Community Nodes feature. (Verification means the node passed n8n's security and quality review; it doesn't imply n8n endorses PerfexCRM.)
 
 ### Do I need the PerfexCRM API & Webhooks module?
 Yes. This node talks to the PerfexCRM REST API exposed by the [PerfexCRM API & Webhooks module](https://perfexapi.com). Without it installed on your PerfexCRM instance, neither the action node nor the trigger node can reach your data.
@@ -166,7 +166,7 @@ Yes. This node talks to the PerfexCRM REST API exposed by the [PerfexCRM API & W
 PerfexCRM 2.3.x and later. Older PerfexCRM versions may work for read-only operations but are not officially tested.
 
 ### Can I use this node on n8n Cloud?
-Not yet. Community nodes only run on self-hosted n8n by default. We're working towards [verified community node](https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes/) status, which would unlock n8n Cloud availability.
+Yes. `n8n-nodes-perfexcrm` is a [verified community node](https://docs.n8n.io/integrations/community-nodes/installation/verified-install/), so it's available on **n8n Cloud** as well as self-hosted. On n8n v1.94+ with verified community nodes enabled, open the nodes panel, find it under **"More from the community,"** and install it in one click — no manual npm setup required.
 
 ### How do I get a PerfexCRM API key?
 In your PerfexCRM admin panel, go to **Setup → API & Webhooks → API Keys**, create a new key with the permissions you need, and copy the value (shown once). See [Authentication & API Credentials](#authentication--api-credentials) for details.
