@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg "MIT License")](https://opensource.org/licenses/MIT)
 [![Verified n8n Community Node](https://img.shields.io/badge/n8n-Verified%20Community%20Node-EA4B71 "Verified n8n community node — installable in one click on n8n Cloud")](https://docs.n8n.io/integrations/community-nodes/installation/verified-install/)
 
-Connect [PerfexCRM](https://www.perfexcrm.com/) to [n8n](https://n8n.io/) with this **verified n8n community node** — installable in one click directly from the n8n canvas, on n8n Cloud or self-hosted — and build no-code / low-code workflow automations across your entire CRM. It ships with **21 PerfexCRM resources**, **181 REST API operations**, and a trigger node with **102 real-time webhook events** — enough coverage to automate leads, tickets, invoices, projects, contracts, subscriptions, and more without writing glue code. Whether you want to sync PerfexCRM data to Slack, Google Sheets, HubSpot, or Mailchimp, push webhook-driven events into any of n8n's 400+ integrations, or orchestrate multi-step CRM workflows, this node is a complete PerfexCRM automation toolkit.
+Connect [PerfexCRM](https://www.perfexcrm.com/) to [n8n](https://n8n.io/) with this **verified n8n community node** — installable in one click directly from the n8n canvas, on n8n Cloud or self-hosted — and build no-code / low-code workflow automations across your entire CRM. It ships with **21 PerfexCRM resources**, **181 REST API operations**, and a trigger node with **103 real-time webhook events** — enough coverage to automate leads, tickets, invoices, projects, contracts, subscriptions, and more without writing glue code. Whether you want to sync PerfexCRM data to Slack, Google Sheets, HubSpot, or Mailchimp, push webhook-driven events into any of n8n's 400+ integrations, or orchestrate multi-step CRM workflows, this node is a complete PerfexCRM automation toolkit.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
@@ -15,7 +15,7 @@ Connect [PerfexCRM](https://www.perfexcrm.com/) to [n8n](https://n8n.io/) with t
 - [Prerequisites — PerfexCRM API & Webhooks Module](#prerequisites--perfexcrm-api--webhooks-module)
 - [Installation](#installation)
 - [PerfexCRM API Operations (21 Resources, 181 Operations)](#perfexcrm-api-operations-21-resources-181-operations)
-- [PerfexCRM Trigger Node — 102 Real-Time Webhook Events](#perfexcrm-trigger-node--102-real-time-webhook-events)
+- [PerfexCRM Trigger Node — 103 Real-Time Webhook Events](#perfexcrm-trigger-node--103-real-time-webhook-events)
 - [Authentication & API Credentials](#authentication--api-credentials)
 - [Example PerfexCRM Automation Workflows](#example-perfexcrm-automation-workflows)
 - [Compatibility & Requirements](#compatibility--requirements)
@@ -29,7 +29,7 @@ Connect [PerfexCRM](https://www.perfexcrm.com/) to [n8n](https://n8n.io/) with t
 - **Sync PerfexCRM leads and customers** to any tool — Slack, Google Sheets, HubSpot, Mailchimp, Airtable, Notion, or any of n8n's 400+ integrations.
 - **Automate invoice and payment notifications** the moment a PerfexCRM invoice is paid, overdue, or cancelled.
 - **Route support tickets intelligently** based on department, priority, or customer tier, and page the right team in real time.
-- **Trigger workflows from 102 PerfexCRM webhook events** — from `lead.created` and `invoice.paid` to `contract.expiring` and `task.overdue`.
+- **Trigger workflows from 103 PerfexCRM webhook events** — from `lead.created` and `invoice.paid` to `contract.expiring` and `task.overdue`.
 - **Eliminate manual PerfexCRM admin work** with no-code / low-code automation — no glue scripts, no cron jobs, no duct-taped Zaps.
 
 ## Prerequisites — PerfexCRM API & Webhooks Module
@@ -93,16 +93,16 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 | **Knowledge Base Group** | 5 | Create, Get, Get Many, Update, Delete |
 | **Utility** | 10 | Get Currencies, Get Taxes, Get Departments, Get Payment Modes, Get Countries, Get Ticket Statuses, Get Ticket Priorities, Get Lead Statuses, Get Lead Sources, Get Contract Types |
 
-### PerfexCRM Trigger Node — 102 Real-Time Webhook Events
+### PerfexCRM Trigger Node — 103 Real-Time Webhook Events
 
 Listen for webhooks from PerfexCRM and start n8n workflows the instant something happens in your CRM — no polling required.
 
-#### Supported Events (102 webhook events)
+#### Supported Events (103 webhook events)
 
 | Category | Events |
 |----------|--------|
 | **Contact** | created, deleted, updated |
-| **Contract** | cancelled, created, deleted, expired, expiring, signed, updated |
+| **Contract** | cancelled, created, deleted, expired, expiring, renewed, signed, updated |
 | **Credit Note** | created, credits_applied, deleted, refund_created, sent, status_changed, updated |
 | **Customer** | contact_added, created, deleted, status_changed, updated |
 | **Estimate** | accepted, converted, created, declined, deleted, expiring, sent, updated |
@@ -175,7 +175,7 @@ Yes. `n8n-nodes-perfexcrm` is a [verified community node](https://docs.n8n.io/in
 In your PerfexCRM admin panel, go to **Setup → API & Webhooks → API Keys**, create a new key with the permissions you need, and copy the value (shown once). See [Authentication & API Credentials](#authentication--api-credentials) for details.
 
 ### What PerfexCRM events can trigger an n8n workflow?
-102 webhook events across 19 categories — leads, customers, invoices, tickets, tasks, contracts, projects, proposals, estimates, payments, subscriptions, knowledge base, and more. See the [full event table](#supported-events-102-webhook-events).
+103 webhook events across 19 categories — leads, customers, invoices, tickets, tasks, contracts, projects, proposals, estimates, payments, subscriptions, knowledge base, and more. See the [full event table](#supported-events-103-webhook-events).
 
 ### Does this node support PerfexCRM custom fields?
 Yes. Create and Update operations include a **Custom Fields** section (under Additional/Update Fields) where you add custom field values — keyed by the field's numeric ID or its slug. Custom field values are also returned in the payload on Get operations and webhook events. Supported across Customers, Contacts, Leads, Projects, Tasks, Tickets, Contracts, Expenses, Invoices, Estimates, Proposals, Credit Notes and Staff (requires the PerfexCRM API & Webhooks module v2.8.9+).

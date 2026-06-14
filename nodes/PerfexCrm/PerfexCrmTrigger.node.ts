@@ -88,6 +88,11 @@ export class PerfexCrmTrigger implements INodeType {
 						description: 'Triggered when a contract is about to expire',
 					},
 					{
+						name: 'Contract Renewed',
+						value: 'contract.renewed',
+						description: 'Triggered when a contract is renewed via the API renew endpoint',
+					},
+					{
 						name: 'Contract Signed',
 						value: 'contract.signed',
 						description: 'Triggered when a contract is signed',
