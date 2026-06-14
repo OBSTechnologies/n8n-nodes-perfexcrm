@@ -273,6 +273,22 @@ export class PerfexCrmTrigger implements INodeType {
 						value: 'item.updated',
 						description: 'Triggered when a catalog item is updated',
 					},
+					// Knowledge Base Events
+					{
+						name: 'KB Article Created',
+						value: 'knowledge_base_article.created',
+						description: 'Triggered when a new knowledge base article is created',
+					},
+					{
+						name: 'KB Article Deleted',
+						value: 'knowledge_base_article.deleted',
+						description: 'Triggered when a knowledge base article is deleted',
+					},
+					{
+						name: 'KB Article Updated',
+						value: 'knowledge_base_article.updated',
+						description: 'Triggered when a knowledge base article is updated',
+					},
 					// Lead Events
 					{
 						name: 'Lead Assigned',

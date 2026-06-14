@@ -111,6 +111,16 @@ import {
 } from './descriptions/NoteDescription';
 
 import {
+	knowledgeBaseFields,
+	knowledgeBaseOperations,
+} from './descriptions/KnowledgeBaseDescription';
+
+import {
+	knowledgeBaseGroupFields,
+	knowledgeBaseGroupOperations,
+} from './descriptions/KnowledgeBaseGroupDescription';
+
+import {
 	utilityFields,
 	utilityOperations,
 } from './descriptions/UtilityDescription';
@@ -211,6 +221,14 @@ export class PerfexCrm implements INodeType {
 						value: 'note',
 					},
 					{
+						name: 'Knowledge Base',
+						value: 'knowledgeBase',
+					},
+					{
+						name: 'Knowledge Base Group',
+						value: 'knowledgeBaseGroup',
+					},
+					{
 						name: 'Subscription',
 						value: 'subscription',
 					},
@@ -257,6 +275,10 @@ export class PerfexCrm implements INodeType {
 			...timesheetFields,
 			...noteOperations,
 			...noteFields,
+			...knowledgeBaseOperations,
+			...knowledgeBaseFields,
+			...knowledgeBaseGroupOperations,
+			...knowledgeBaseGroupFields,
 			...utilityOperations,
 			...utilityFields,
 		],
@@ -353,7 +375,7 @@ export class PerfexCrm implements INodeType {
 					return response.data;
 				} else if (response && typeof response === 'object') {
 					// Some endpoints return object with different keys
-					const possibleArrayKeys = ['invoices', 'customers', 'tickets', 'leads', 'projects', 'contracts', 'tasks', 'expenses', 'estimates', 'staff', 'proposals', 'items', 'credit_notes', 'subscriptions', 'payments', 'contacts', 'timesheets', 'notes', 'results'];
+					const possibleArrayKeys = ['invoices', 'customers', 'tickets', 'leads', 'projects', 'contracts', 'tasks', 'expenses', 'estimates', 'staff', 'proposals', 'items', 'credit_notes', 'subscriptions', 'payments', 'contacts', 'timesheets', 'notes', 'articles', 'groups', 'knowledge_base', 'results'];
 					const arrayKey = possibleArrayKeys.find(key => Array.isArray(response[key]));
 					return arrayKey ? response[arrayKey] : [];
 				}
@@ -2771,6 +2793,146 @@ export class PerfexCrm implements INodeType {
 						responseData = await makeRequestWithRetry({
 							method: 'DELETE',
 							url: `${baseUrl}/api/${apiVersion}/notes/${noteId}`,
+							json: true,
+							headers,
+						});
+					}
+				} else if (resource === 'knowledgeBase') {
+					if (operation === 'create') {
+						const subject = this.getNodeParameter('subject', i) as string;
+						const description = this.getNodeParameter('description', i) as string;
+						const articlegroup = this.getNodeParameter('articlegroup', i) as number;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						const body: any = {
+							subject,
+							description,
+							articlegroup,
+							...additionalFields,
+						};
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/knowledge-base`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'get') {
+						const articleId = this.getNodeParameter('articleId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/knowledge-base/${articleId}`,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'getAll') {
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+						const offset = returnAll ? 0 : (this.getNodeParameter('offset', i) as number);
+
+						const qs: Record<string, any> = {};
+						for (const [key, value] of Object.entries(filters)) {
+							if (value === '' || value === undefined || value === null) continue;
+							qs[key] = value;
+						}
+
+						responseData = await fetchAllPaginated(
+							`${baseUrl}/api/${apiVersion}/knowledge-base`,
+							qs,
+							returnAll,
+							limit,
+							offset,
+						);
+					} else if (operation === 'update') {
+						const articleId = this.getNodeParameter('articleId', i) as string;
+						const updateFields = this.getNodeParameter('updateFields', i) as Record<string, unknown>;
+
+						const body = updateFields;
+
+						responseData = await makeRequestWithRetry({
+							method: 'PUT',
+							url: `${baseUrl}/api/${apiVersion}/knowledge-base/${articleId}`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'delete') {
+						const articleId = this.getNodeParameter('articleId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'DELETE',
+							url: `${baseUrl}/api/${apiVersion}/knowledge-base/${articleId}`,
+							json: true,
+							headers,
+						});
+					}
+				} else if (resource === 'knowledgeBaseGroup') {
+					if (operation === 'create') {
+						const name = this.getNodeParameter('name', i) as string;
+						const additionalFields = this.getNodeParameter('additionalFields', i) as Record<string, unknown>;
+
+						const body: any = {
+							name,
+							...additionalFields,
+						};
+
+						responseData = await makeRequestWithRetry({
+							method: 'POST',
+							url: `${baseUrl}/api/${apiVersion}/knowledge-base/groups`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'get') {
+						const groupId = this.getNodeParameter('groupId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/knowledge-base/groups/${groupId}`,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'getAll') {
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const filters = this.getNodeParameter('filters', i) as Record<string, any>;
+						const limit = returnAll ? 0 : (this.getNodeParameter('limit', i) as number);
+						const offset = returnAll ? 0 : (this.getNodeParameter('offset', i) as number);
+
+						const qs: Record<string, any> = {};
+						for (const [key, value] of Object.entries(filters)) {
+							if (value === '' || value === undefined || value === null) continue;
+							qs[key] = value;
+						}
+
+						responseData = await fetchAllPaginated(
+							`${baseUrl}/api/${apiVersion}/knowledge-base/groups`,
+							qs,
+							returnAll,
+							limit,
+							offset,
+						);
+					} else if (operation === 'update') {
+						const groupId = this.getNodeParameter('groupId', i) as string;
+						const updateFields = this.getNodeParameter('updateFields', i) as Record<string, unknown>;
+
+						const body = updateFields;
+
+						responseData = await makeRequestWithRetry({
+							method: 'PUT',
+							url: `${baseUrl}/api/${apiVersion}/knowledge-base/groups/${groupId}`,
+							body,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'delete') {
+						const groupId = this.getNodeParameter('groupId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'DELETE',
+							url: `${baseUrl}/api/${apiVersion}/knowledge-base/groups/${groupId}`,
 							json: true,
 							headers,
 						});
