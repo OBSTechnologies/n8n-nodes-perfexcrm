@@ -19,6 +19,7 @@ import {
 } from './helpers/validation';
 
 import { applyCustomFields } from './helpers/customFields';
+import { applyLineItems } from './helpers/lineItems';
 
 import {
 	customerFields,
@@ -325,6 +326,9 @@ export class PerfexCrm implements INodeType {
 			// Convert the UI custom-field collection (body.customFields) into the
 			// API's flat custom_fields map. No-op for requests without custom fields.
 			applyCustomFields(options?.body);
+			// Convert the UI line-item collection (body.lineItems) into the API's
+			// newitems array. No-op for requests without line items.
+			applyLineItems(options?.body);
 			let lastError: any;
 			for (let attempt = 0; attempt < maxRetries; attempt++) {
 				try {
@@ -779,6 +783,7 @@ export class PerfexCrm implements INodeType {
 							number,
 							date: normalizedDate,
 							duedate: normalizedDueDate,
+							lineItems: this.getNodeParameter('lineItems', i, {}),
 							...additionalFields,
 						};
 
@@ -795,6 +800,15 @@ export class PerfexCrm implements INodeType {
 						responseData = await makeRequestWithRetry({
 							method: 'GET',
 							url: `${baseUrl}/api/${apiVersion}/invoices/${invoiceId}`,
+							json: true,
+							headers,
+						});
+					} else if (operation === 'getPdf') {
+						const invoiceId = this.getNodeParameter('invoiceId', i) as string;
+
+						responseData = await makeRequestWithRetry({
+							method: 'GET',
+							url: `${baseUrl}/api/${apiVersion}/invoices/${invoiceId}/pdf`,
 							json: true,
 							headers,
 						});
@@ -1363,6 +1377,7 @@ export class PerfexCrm implements INodeType {
 						const body: any = {
 							clientid: clientId,
 							date: normalizedDate,
+							lineItems: this.getNodeParameter('lineItems', i, {}),
 							...additionalFields,
 						};
 
@@ -2164,6 +2179,7 @@ export class PerfexCrm implements INodeType {
 						const body: any = {
 							clientid: clientId,
 							date: normalizedDate,
+							lineItems: this.getNodeParameter('lineItems', i, {}),
 							...additionalFields,
 						};
 

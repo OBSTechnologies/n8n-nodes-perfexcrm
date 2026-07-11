@@ -37,6 +37,12 @@ export const invoiceOperations: INodeProperties[] = [
 				action: 'Get many invoices',
 			},
 			{
+				name: 'Get PDF',
+				value: 'getPdf',
+				description: 'Get the invoice as a base64-encoded PDF',
+				action: 'Get an invoice PDF',
+			},
+			{
 				name: 'Get Payments',
 				value: 'getPayments',
 				description: 'Get all payments for an invoice',
@@ -118,6 +124,35 @@ export const invoiceFields: INodeProperties[] = [
 			},
 		},
 		description: 'Invoice due date',
+	},
+	{
+		displayName: 'Line Items',
+		name: 'lineItems',
+		type: 'fixedCollection',
+		placeholder: 'Add Line Item',
+		typeOptions: { multipleValues: true },
+		default: {},
+		displayOptions: {
+			show: {
+				resource: ['invoice'],
+				operation: ['create'],
+			},
+		},
+		description: 'Line items for the invoice. Totals are calculated from these; without at least one item the invoice value is 0.',
+		options: [
+			{
+				name: 'item',
+				displayName: 'Item',
+				values: [
+					{ displayName: 'Description', name: 'description', type: 'string', default: '' },
+					{ displayName: 'Long Description', name: 'long_description', type: 'string', default: '' },
+					{ displayName: 'Quantity', name: 'qty', type: 'number', default: 1 },
+					{ displayName: 'Rate', name: 'rate', type: 'number', default: 0, description: 'Unit price' },
+					{ displayName: 'Tax Name', name: 'taxname', type: 'string', default: '', description: 'E.g. "VAT|24.00"; comma-separate multiple taxes' },
+					{ displayName: 'Unit', name: 'unit', type: 'string', default: '', description: 'E.g. hours, pcs' },
+				],
+			},
+		],
 	},
 	{
 		displayName: 'Additional Fields',
@@ -261,7 +296,7 @@ export const invoiceFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['invoice'],
-				operation: ['get'],
+				operation: ['get', 'getPdf'],
 			},
 		},
 		description: 'The ID of the invoice',

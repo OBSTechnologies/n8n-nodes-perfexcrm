@@ -240,6 +240,35 @@ export const creditNoteFields: INodeProperties[] = [
 		description: 'Credit note date (YYYY-MM-DD)',
 	},
 	{
+		displayName: 'Line Items',
+		name: 'lineItems',
+		type: 'fixedCollection',
+		placeholder: 'Add Line Item',
+		typeOptions: { multipleValues: true },
+		default: {},
+		displayOptions: {
+			show: {
+				resource: ['creditNote'],
+				operation: ['create'],
+			},
+		},
+		description: 'Line items for the credit note. Totals are calculated from these; without at least one item the credit note value is 0.',
+		options: [
+			{
+				name: 'item',
+				displayName: 'Item',
+				values: [
+					{ displayName: 'Description', name: 'description', type: 'string', default: '' },
+					{ displayName: 'Long Description', name: 'long_description', type: 'string', default: '' },
+					{ displayName: 'Quantity', name: 'qty', type: 'number', default: 1 },
+					{ displayName: 'Rate', name: 'rate', type: 'number', default: 0, description: 'Unit price' },
+					{ displayName: 'Tax Name', name: 'taxname', type: 'string', default: '', description: 'E.g. "VAT|24.00"; comma-separate multiple taxes' },
+					{ displayName: 'Unit', name: 'unit', type: 'string', default: '', description: 'E.g. hours, pcs' },
+				],
+			},
+		],
+	},
+	{
 		displayName: 'Additional Fields',
 		name: 'additionalFields',
 		type: 'collection',

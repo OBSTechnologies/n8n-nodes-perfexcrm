@@ -87,12 +87,12 @@ describe('Node Description Structure', () => {
 		expect(resourceParam.noDataExpression).toBe(true);
 	});
 
-	it('should have 19 resource options', () => {
+	it('should have 21 resource options', () => {
 		const options = resourceParam.options as Array<{ value: string }>;
-		expect(options).toHaveLength(19);
+		expect(options).toHaveLength(21);
 	});
 
-	it('should include all 19 resources', () => {
+	it('should include all 21 resources', () => {
 		const resourceValues = (resourceParam.options as Array<{ value: string }>).map(
 			(o) => o.value,
 		);
@@ -114,6 +114,8 @@ describe('Node Description Structure', () => {
 			'contact',
 			'timesheet',
 			'note',
+			'knowledgeBase',
+			'knowledgeBaseGroup',
 			'subscription',
 			'utility',
 		];

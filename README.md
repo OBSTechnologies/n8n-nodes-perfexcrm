@@ -73,7 +73,7 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 |----------|:---:|------------|
 | **Customer** | 10 | Create, Get, Get Many, Update, Delete, Get Contacts, Get Contracts, Get Invoices, Get Projects, Get Tickets |
 | **Ticket** | 14 | Create, Get, Get Many, Update, Delete, Add Reply, Get Reply, Update Reply, Delete Reply, List Replies, Get Attachments, Get History, Assign, Change Status |
-| **Invoice** | 7 | Create, Get, Get Many, Update, Delete, Get Payments, Send |
+| **Invoice** | 8 | Create, Get, Get Many, Update, Delete, Get Payments, Get PDF, Send |
 | **Lead** | 8 | Create, Get, Get Many, Update, Delete, Convert, Get Activities, Get Notes |
 | **Project** | 9 | Create, Get, Get Many, Update, Delete, Get Activity, Get Files, Get Milestones, Get Tasks |
 | **Contract** | 11 | Create, Get, Get Many, Update, Delete, Sign, Get Attachments, Get Comments, Get Expired, Get Expiring, Renew |
@@ -176,6 +176,9 @@ In your PerfexCRM admin panel, go to **Setup → API & Webhooks → API Keys**, 
 
 ### What PerfexCRM events can trigger an n8n workflow?
 103 webhook events across 19 categories — leads, customers, invoices, tickets, tasks, contracts, projects, proposals, estimates, payments, subscriptions, knowledge base, and more. See the [full event table](#supported-events-103-webhook-events).
+
+### How do I add line items to an invoice, estimate or credit note?
+Create operations for Invoices, Estimates and Credit Notes include a **Line Items** section where you add one or more items (description, quantity, rate, and optionally long description, unit and tax name). Totals are calculated from the line items — without at least one item the document value is 0.
 
 ### Does this node support PerfexCRM custom fields?
 Yes. Create and Update operations include a **Custom Fields** section (under Additional/Update Fields) where you add custom field values — keyed by the field's numeric ID or its slug. Custom field values are also returned in the payload on Get operations and webhook events. Supported across Customers, Contacts, Leads, Projects, Tasks, Tickets, Contracts, Expenses, Invoices, Estimates, Proposals, Credit Notes and Staff (requires the PerfexCRM API & Webhooks module v2.8.9+).
