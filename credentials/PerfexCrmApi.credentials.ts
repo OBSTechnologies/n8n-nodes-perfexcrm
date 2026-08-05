@@ -8,7 +8,7 @@ import {
 export class PerfexCrmApi implements ICredentialType {
 	name = 'perfexCrmApi';
 	displayName = 'PerfexCRM API';
-	documentationUrl = 'https://github.com/your-org/n8n-nodes-perfexcrm';
+	documentationUrl = 'https://github.com/OBSTechnologies/n8n-nodes-perfexcrm';
 	properties: INodeProperties[] = [
 		{
 			displayName: 'Base URL',

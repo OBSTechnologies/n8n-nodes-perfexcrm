@@ -221,6 +221,16 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - PerfexCRM Modules: [perfexapi.com](https://perfexapi.com)
 - GitHub: [@OBSTechnologies](https://github.com/OBSTechnologies)
 
+## Trademarks
+
+Perfex CRM is a trademark of its respective owner. This package is an independent
+product built and published by OBS Technologies and is not affiliated with,
+endorsed by, or sponsored by Perfex CRM / MSTdev. It is also not affiliated with
+or endorsed by n8n GmbH — "verified" refers to n8n's technical review of the
+package, not an endorsement of PerfexCRM. The node connects exclusively to the
+[PerfexCRM API & Webhooks module](https://perfexapi.com) by OBS Technologies and
+does not use, include, or depend on any other vendor's API module.
+
 ## License
 
 [MIT](https://github.com/OBSTechnologies/n8n-nodes-perfexcrm/blob/main/LICENSE) (c) OBS Technologies
